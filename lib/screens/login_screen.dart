@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.title});
@@ -20,16 +21,23 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'App Logo - Screen number 2',
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                // Navigate to the home screen
+                GoRouter.of(context).go('/');
+              },
+              child: const Text('Go to Inventory'),
             ),
-            Text(
-                'This is a test'
+            ElevatedButton(
+              onPressed: () {
+                // Navigate to the inventory screen
+                GoRouter.of(context).go('/inventory');
+              },
+              child: const Text('Go to Inventory'),
             ),
-          ],
-        ),
+          ]
+        )
       ),
     );
   }
