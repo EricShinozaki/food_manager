@@ -34,7 +34,7 @@ class HomeNavigationBar extends StatelessWidget {
           NavigationDestination(icon: Icon(Icons.inventory_2), label: 'Inventory'),
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
           NavigationDestination(icon: Icon(Icons.crop_free), label: 'Scan'),
-          NavigationDestination(icon: Icon(Icons.home), label: 'Notifications'),
+          NavigationDestination(icon: Icon(Icons.notification_add), label: 'Notifications'),
         ],
       ),
     );

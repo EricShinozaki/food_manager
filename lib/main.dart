@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:food_manager/router.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,10 +14,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       routerConfig: router,
       title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: FlexThemeData.light(scheme: FlexScheme.bahamaBlue),
+      darkTheme: FlexThemeData.dark(scheme: FlexScheme.bahamaBlue),
+      themeMode: ThemeMode.system,
     );
   }
 }
