@@ -76,7 +76,7 @@ final GoRouter _router =  GoRouter(
                         path: 'itemDetails/:name',
                         builder: (context, state) {
                         final ingredientName = state.pathParameters['name']!;
-                        return ItemDetailsScreen(title: "$ingredientName details");
+                        return ItemDetailsScreen(title: ingredientName);
                       }
                     ),
                   ]
