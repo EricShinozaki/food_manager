@@ -37,9 +37,18 @@ class HomeNavigationBar extends StatelessWidget {
 
   int _getIndex(String location) {
     switch(location) {
-      case '/notifications/itemNotification':
-        return 2;
-
+      case '/recipes/addRecipe': // Added as floatingActionButton -- ADDED
+        return 0;
+      case '/recipes/recipeDetails': // Include in list view
+        return 0;
+      case '/recipes/recipeDetails/ingredientDetails': // Include in list view of each detail page
+        return 0;
+      case '/inventory/itemDetails': // Include in list view of inventory page
+        return 1;
+      case '/scanning/scannedItemDetails': // List view
+        return 3;
+      case '/notifications/itemNotification': // List view
+        return 4;
     }
 
     return ['/recipes', '/inventory', '/', '/scanning', '/notifications']

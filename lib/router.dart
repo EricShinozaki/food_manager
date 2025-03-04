@@ -44,6 +44,13 @@ final GoRouter _router =  GoRouter(
                       name: "recipeDetails",
                       path: 'recipeDetails',
                       builder: (context, state) => RecipeDetailsScreen(title: "Recipe Details"),
+                      routes: [
+                        GoRoute(
+                          name: "ingredientDetails",
+                          path: "ingredientDetails",
+                          builder: (context, state) => ItemDetailsScreen(title: "Item Details"),
+                        )
+                      ]
                     ),
                   ]
               ),
@@ -79,7 +86,7 @@ final GoRouter _router =  GoRouter(
                     GoRoute(
                       name: "itemNotification",
                       path: 'itemNotification',
-                      builder: (context, state) => ItemDetailsScreen(title: "Item Details"),
+                      builder: (context, state) => ItemDetailsScreen(title: "Temporary Notification info"),
                     ),
                   ]
               ),
