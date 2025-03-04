@@ -72,9 +72,12 @@ final GoRouter _router =  GoRouter(
                   builder: (context, state) => InventoryScreen(title: "Inventory"),
                   routes: [
                     GoRoute(
-                      name: "itemDetails",
-                      path: 'itemDetails',
-                      builder: (context, state) => ItemDetailsScreen(title: "Item Details"),
+                        name: "itemDetails",
+                        path: 'itemDetails/:name',
+                        builder: (context, state) {
+                        final ingredientName = state.pathParameters['name']!;
+                        return ItemDetailsScreen(title: "$ingredientName details");
+                      }
                     ),
                   ]
               ),

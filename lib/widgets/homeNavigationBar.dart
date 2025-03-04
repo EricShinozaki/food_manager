@@ -36,23 +36,19 @@ class HomeNavigationBar extends StatelessWidget {
   }
 
   int _getIndex(String location) {
-    switch(location) {
-      case '/recipes/addRecipe': // Added as floatingActionButton -- ADDED
-        return 0;
-      case '/recipes/recipeDetails': // Include in list view
-        return 0;
-      case '/recipes/recipeDetails/ingredientDetails': // Include in list view of each detail page
-        return 0;
-      case '/inventory/itemDetails': // Include in list view of inventory page
-        return 1;
-      case '/scanning/scannedItemDetails': // List view
-        return 3;
-      case '/notifications/itemNotification': // List view
-        return 4;
+    // Check if the location path starts with any of the main routes
+    if (location.startsWith('/recipes')) {
+      return 0;  // Recipes tab
+    } else if (location.startsWith('/inventory')) {
+      return 1;  // Inventory tab
+    } else if (location.startsWith('/scanning')) {
+      return 3;  // Scan tab
+    } else if (location.startsWith('/notifications')) {
+      return 4;  // Notifications tab
     }
 
-    return ['/recipes', '/inventory', '/', '/scanning', '/notifications']
-        .indexOf(location);
+    // Default to Home tab if no match
+    return 2;
   }
 
   String _getPath(int index) {

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:food_manager/ItemProvider.dart';
+import 'package:go_router/go_router.dart';
 
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key, required this.title});
@@ -17,10 +19,21 @@ class _InventoryScreenState extends State<InventoryScreen> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-        ),
+      body: ListView.builder(
+        itemCount: ItemProvider().items.length,
+        itemBuilder: (context, index){
+          final item = ItemProvider().items[index];
+          return ListTile(
+            title: Text(item.name),
+            subtitle: Text("Quantity: ${item.quantity}"),
+            trailing: ElevatedButton(
+              onPressed: () {
+                context.go('/inventory/itemDetails/${item.name}');
+              },
+              child: Text('View Details'),
+            )
+          );
+        }
       ),
     );
   }

@@ -22,11 +22,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.go('/notifications/itemNotification'),
-        tooltip: 'Add a recipe',
-        child: const Icon(Icons.add),
       ), //
     );
   }
