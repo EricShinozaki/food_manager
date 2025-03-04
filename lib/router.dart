@@ -103,19 +103,23 @@ final GoRouter _router =  GoRouter(
         ],
       ),
       GoRoute(
-        name: "forgotPassword",
-        path: '/forgotPassword',
-        builder: (context, state) => ForgotPasswordScreen(title: "Forgot Password"),
-      ),
-      GoRoute(
         name: "login",
         path: '/login',
         builder: (context, state) => LoginScreen(title: "Login"),
-      ),
-      GoRoute(
-        name: "resetPassword",
-        path: '/resetPassword',
-        builder: (context, state) => ResetPasswordScreen(title: "Reset Password"),
+        routes: [
+          GoRoute(
+            name: "forgotPassword",
+            path: 'forgotPassword',
+            builder: (context, state) => ForgotPasswordScreen(title: "Forgot Password"),
+            routes: [
+              GoRoute(
+                name: "resetPassword",
+                path: 'resetPassword',
+                builder: (context, state) => ResetPasswordScreen(title: "Reset Password"),
+              ),
+            ]
+          ),
+        ]
       ),
     ]
 );

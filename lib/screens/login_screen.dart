@@ -49,8 +49,11 @@ class _LoginScreenState extends State<LoginScreen> {
                    child: TextField(
                     obscureText: false,
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
                       labelText: 'Email',
+                      prefixIcon: Icon(Icons.email),
                     ),
                    ),
                  ),
@@ -59,28 +62,37 @@ class _LoginScreenState extends State<LoginScreen> {
                    child: TextField(
                      obscureText: true,
                      decoration: InputDecoration(
-                       border: OutlineInputBorder(),
+                       border: OutlineInputBorder(
+                         borderRadius: BorderRadius.circular(30),
+                       ),
                        labelText: 'Password',
+                       prefixIcon: Icon(Icons.password)
                      ),
                    ),
                  ),
                  Container(
-                   margin: EdgeInsets.only(left: 35, right: 35, bottom: 10, top: 10),
-                   child: Text(
-                       'Forgot Password?',
-                       style: TextStyle(
-                         color: Colors.red,
-                       )
-                   ),
-                 ),
-                 Container(
                    margin: EdgeInsets.only(left: 35, right: 35),
-                   child: FloatingActionButton(
+                   child: FilledButton.tonal(
                      child: Text("Login"),
                      onPressed:(){
                        context.go('/');
                      },
                    )
+                 ),
+                 Container(
+                   margin: EdgeInsets.only(left: 35, right: 35, bottom: 10, top: 10),
+                   child: TextButton(
+                     onPressed: () => context.go('/login/forgotPassword'),
+                     child: const Text('Forgot Password?'),
+                   )
+                   /*TextButton(
+                       'Forgot Password?',
+                       style: TextStyle(
+                         color: Colors.red,
+                       ),
+                      onPressed: () {  },
+                   ),
+                    */
                  ),
                ],
              ),
@@ -98,13 +110,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-
-/*
-ElevatedButton(
-onPressed: () {
-// Navigate to the inventory screen
-GoRouter.of(context).go('/');
-},
-child: const Text('Login'),
-),
- */

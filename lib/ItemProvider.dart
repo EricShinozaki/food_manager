@@ -54,4 +54,14 @@ class ItemProvider with ChangeNotifier {
     items.removeAt(index);
     notifyListeners(); // Notify listeners of change
   }
+
+  void sortItemsByName() {
+    items.sort((a, b) => a.name.compareTo(b.name));
+    notifyListeners();
+  }
+
+  void sortItemsByQuantity() {
+    items.sort((a, b) => a.quantity.compareTo(b.quantity));
+    notifyListeners();
+  }
 }

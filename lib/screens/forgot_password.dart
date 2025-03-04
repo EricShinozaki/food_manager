@@ -18,17 +18,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'App Logo - Screen number 2',
-            ),
-            Text(
-                'This is a test'
-            ),
-          ],
-        ),
+
       ),
     );
   }

@@ -28,7 +28,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                     Container(
                       margin: EdgeInsets.only(left: 35, right: 35, top: 10, bottom: 10),
                         child: Text(
-                          "${Item.name}s \nQuantity: ${Item.quantity} ${Item.unit}",
+                          "${Item.name} \nQuantity: ${Item.quantity} ${Item.unit}",
                           style: TextStyle(
                             fontSize: 20
                           ),
