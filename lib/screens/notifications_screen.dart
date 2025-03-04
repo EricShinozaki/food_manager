@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key, required this.title});
@@ -20,16 +21,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'App Logo - Screen number 2',
-            ),
-            Text(
-                'This is a test'
-            ),
-          ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.go('/notifications/itemNotification'),
+        tooltip: 'Add a recipe',
+        child: const Icon(Icons.add),
+      ), //
     );
   }
 }

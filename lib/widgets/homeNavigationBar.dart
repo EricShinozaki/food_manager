@@ -7,28 +7,17 @@ class HomeNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get the current route
+    final String location = GoRouterState.of(context).uri.path;
+
     return Scaffold(
       body: child,
       bottomNavigationBar: NavigationBar(
+        selectedIndex: _getIndex(location), // Determine selected tab
         onDestinationSelected: (index) {
-          switch (index) {
-            case 0:
-              context.go('/recipes');
-              break;
-            case 1:
-              context.go('/inventory');
-              break;
-            case 2:
-              context.go('/');
-              break;
-            case 3:
-              context.go('/scanning');
-              break;
-            case 4:
-              context.go('/notifications');
-              break;
-          }
+          context.go(_getPath(index)); // Navigate on tap
         },
+        indicatorColor: Colors.blue.withOpacity(0.2),
         destinations: const [
           NavigationDestination(icon: Icon(Icons.flatware), label: 'Recipes'),
           NavigationDestination(icon: Icon(Icons.inventory_2), label: 'Inventory'),
@@ -37,7 +26,27 @@ class HomeNavigationBar extends StatelessWidget {
           NavigationDestination(icon: Icon(Icons.notification_add), label: 'Notifications'),
         ],
       ),
+      /*floatingActionButton: location != '/settings'
+          ? FloatingActionButton(
+            onPressed: () => context.go('/settings'),
+            child: const Icon(Icons.settings),
+          )
+          : null, */
     );
   }
 
+  int _getIndex(String location) {
+    switch(location) {
+      case '/notifications/itemNotification':
+        return 2;
+
+    }
+
+    return ['/recipes', '/inventory', '/', '/scanning', '/notifications']
+        .indexOf(location);
+  }
+
+  String _getPath(int index) {
+    return ['/recipes', '/inventory', '/', '/scanning', '/notifications'][index];
+  }
 }

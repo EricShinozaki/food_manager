@@ -83,6 +83,11 @@ final GoRouter _router =  GoRouter(
                     ),
                   ]
               ),
+              GoRoute(
+                name: "settings",
+                path: 'settings',
+                builder: (context, state) => SettingsScreen(title: "Settings"),
+              )
             ]
           ),
         ],
@@ -101,11 +106,6 @@ final GoRouter _router =  GoRouter(
         name: "resetPassword",
         path: '/resetPassword',
         builder: (context, state) => ResetPasswordScreen(title: "Reset Password"),
-      ),
-      GoRoute(
-        name: "settings",
-        path: '/settings',
-        builder: (context, state) => SettingsScreen(title: "Settings"),
       ),
     ]
 );
