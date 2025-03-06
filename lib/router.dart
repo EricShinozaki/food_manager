@@ -42,8 +42,11 @@ final GoRouter _router =  GoRouter(
                     ),
                     GoRoute(
                       name: "recipeDetails",
-                      path: 'recipeDetails',
-                      builder: (context, state) => RecipeDetailsScreen(title: "Recipe Details"),
+                      path: 'recipeDetails/:name',
+                      builder: (context, state) {
+                        final recipeName = state.pathParameters['name']!;
+                        return RecipeDetailsScreen(title: recipeName);
+                      },
                       routes: [
                         GoRoute(
                           name: "ingredientDetails",

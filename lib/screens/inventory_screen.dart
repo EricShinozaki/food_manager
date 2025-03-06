@@ -26,12 +26,9 @@ class _InventoryScreenState extends State<InventoryScreen> {
           return ListTile(
             title: Text(item.name),
             subtitle: Text("Quantity: ${item.quantity} ${item.unit}"),
-            trailing: ElevatedButton(
-              onPressed: () {
+              onTap: () {
                 context.go('/inventory/itemDetails/${item.name}');
-              },
-              child: Text('View Details'),
-            )
+              }
           );
         }
       ),
