@@ -22,11 +22,11 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
       body: Column(
           children: [
             Expanded(
-                flex: 15,
+                flex: 4,
                 child: Row(
                   children: [
                     Container(
-                      margin: EdgeInsets.only(left: 35, right: 35, top: 10, bottom: 10),
+                      margin: EdgeInsets.only(left: 15, right: 35, top: 10, bottom: 10),
                         child: Text(
                           "${Item.name} \nQuantity: ${Item.quantity} ${Item.unit}",
                           style: TextStyle(
@@ -42,7 +42,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                 child: Row(
                   children: [
                     Container(
-                      margin: EdgeInsets.only(left: 35, right: 35),
+                      margin: EdgeInsets.only(left: 15, right: 35),
                         child: Text(
                           "Notes: ${Item.note}",
                           style: TextStyle(
@@ -58,7 +58,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
               child: Row(
                   children: [
                     Container(
-                        margin: EdgeInsets.only(left: 35, right: 35),
+                        margin: EdgeInsets.only(left: 15, right: 35),
                         child: Text(
                             "Nutrition: ${getNutritionString(Item)}",
                             style: TextStyle(

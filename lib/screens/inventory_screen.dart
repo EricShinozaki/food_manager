@@ -24,8 +24,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
         itemBuilder: (context, index){
           final item = ItemProvider().items[index];
           return ListTile(
-            title: Text(item.name),
-            subtitle: Text("Quantity: ${item.quantity} ${item.unit}"),
+            title: Text(item.name, style: TextStyle(fontSize: 20)),
+            subtitle: Text("Quantity: ${item.quantity} ${item.unit}", style: TextStyle(fontSize: 15)),
               onTap: () {
                 context.go('/inventory/itemDetails/${item.name}');
               }

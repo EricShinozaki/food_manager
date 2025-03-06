@@ -24,8 +24,8 @@ class _RecipesScreenState extends State<RecipesScreen> {
           itemBuilder: (context, index){
             final recipe = RecipeProvider().recipes[index];
             return ListTile(
-                title: Text(recipe.name),
-                subtitle: Text("Servings: ${recipe.servings}"),
+                title: Text(recipe.name, style: TextStyle(fontSize: 20)),
+                subtitle: Text("Servings: ${recipe.servings}", style: TextStyle(fontSize: 15)),
                 onTap: () {
                   context.go('/recipes/recipeDetails/${recipe.name}');
                 }
