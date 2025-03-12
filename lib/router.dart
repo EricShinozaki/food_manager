@@ -11,7 +11,6 @@ import 'package:food_manager/screens/recipes_screen.dart';
 import 'package:food_manager/screens/reset_password.dart';
 import 'package:food_manager/screens/scanning_screen.dart';
 import 'package:food_manager/screens/settings_screen.dart';
-import 'package:food_manager/screens/takePictureScreen.dart';
 import 'package:food_manager/widgets/homeNavigationBar.dart';
 import 'package:go_router/go_router.dart';
 
@@ -71,11 +70,6 @@ final GoRouter _router =  GoRouter(
                     path: 'scannedItemDetails',
                     builder: (context, state) => ItemDetailsScreen(title: "Item Details"),
                   ),
-                  GoRoute(
-                    name: "takePicture",
-                    path: "takePicture",
-                    builder: (context, state) => TakePictureScreen(title: "Scan a receipt"),
-                  )
                 ],
               ),
               GoRoute(
