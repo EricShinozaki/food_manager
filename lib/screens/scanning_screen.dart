@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ScanningScreen extends StatefulWidget {
   const ScanningScreen({super.key, required this.title});
@@ -17,10 +18,29 @@ class _ScanningScreenState extends State<ScanningScreen> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-        ),
+      body: Column(
+        children: [
+          Expanded(
+            flex: 92,
+            child: Center(
+
+            )
+          ),
+          Expanded(
+            flex: 8,
+            child: Container(
+              margin: const EdgeInsets.only(left: 35, right: 35, bottom: 10, top: 15),
+              child: Center(
+                child: FilledButton.tonal(
+                  onPressed: () {
+                    context.go('/scanning/takePicture');
+                  },
+                  child: const Text("Scan a receipt"),
+                ),
+              )
+            ),
+          ),
+        ],
       ),
     );
   }
