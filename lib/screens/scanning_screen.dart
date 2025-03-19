@@ -34,8 +34,8 @@ class _ScanningScreenState extends State<ScanningScreen> {
             flex: 20,
             child: GestureDetector(
               onTap: (){
-                context.go(
-                    '/scanning/viewReceipt',
+                context.push(
+                    '/viewReceipt',
                     extra: galleryFile,
                 );
               },

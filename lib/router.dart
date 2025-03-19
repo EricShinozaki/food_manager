@@ -73,15 +73,6 @@ final GoRouter _router =  GoRouter(
                     path: 'scannedItemDetails',
                     builder: (context, state) => ItemDetailsScreen(title: "Item Details"),
                   ),
-                  GoRoute(
-                    name: "viewReceipt",
-                    path: "viewReceipt",
-                    builder: (context, state) {
-                      final file = state.extra as File?;
-                      return ViewReceiptScreen(imageFile: file);
-                    },
-
-                  ),
                 ],
               ),
               GoRoute(
@@ -138,6 +129,16 @@ final GoRouter _router =  GoRouter(
             ]
           ),
         ]
+      ),
+      GoRoute(
+        name: "viewReceipt",
+        path: "/viewReceipt",
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final file = state.extra as File?;
+          return ViewReceiptScreen(imageFile: file);
+        },
+
       ),
     ]
 );
