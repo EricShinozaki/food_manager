@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:food_manager/screens/add_recipe_screen.dart';
 import 'package:food_manager/screens/forgot_password.dart';
@@ -11,6 +13,7 @@ import 'package:food_manager/screens/recipes_screen.dart';
 import 'package:food_manager/screens/reset_password.dart';
 import 'package:food_manager/screens/scanning_screen.dart';
 import 'package:food_manager/screens/settings_screen.dart';
+import 'package:food_manager/screens/viewReceiptScreen.dart';
 import 'package:food_manager/widgets/homeNavigationBar.dart';
 import 'package:go_router/go_router.dart';
 
@@ -69,6 +72,15 @@ final GoRouter _router =  GoRouter(
                     name: "scannedItemDetails",
                     path: 'scannedItemDetails',
                     builder: (context, state) => ItemDetailsScreen(title: "Item Details"),
+                  ),
+                  GoRoute(
+                    name: "viewReceipt",
+                    path: "viewReceipt",
+                    builder: (context, state) {
+                      final file = state.extra as File?;
+                      return ViewReceiptScreen(imageFile: file);
+                    },
+
                   ),
                 ],
               ),

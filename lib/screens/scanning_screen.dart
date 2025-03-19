@@ -1,6 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:food_manager/screens/viewReceiptScreen.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image/image.dart' as img;
@@ -30,19 +31,48 @@ class _ScanningScreenState extends State<ScanningScreen> {
       body: Column(
         children: [
           Expanded(
-            flex: 30,
-            child: galleryFile == null
-                ? const Center(child: Text('No Image Selected'))
-                : Center(child: Image.file(galleryFile!)),
+            flex: 20,
+            child: GestureDetector(
+              onTap: (){
+                context.go(
+                    '/scanning/viewReceipt',
+                    extra: galleryFile,
+                );
+              },
+              child: galleryFile == null
+                  ? const Center(child: Text('No Image Selected'))
+                  : Center(child: Image.file(galleryFile!)),
+            )
           ),
           Expanded(
-            flex: 60,
-            child: SingleChildScrollView(
-              child: Text(
-                _recognizedText,
-                style: TextStyle(fontSize: 16), // Adjust font size as needed
-              ),
-            ),
+            flex: 35,
+            child: Container(
+              margin: EdgeInsets.only(top: 20, bottom: 20, left: 15, right: 15),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: SingleChildScrollView(
+                  child: Text(
+                    _recognizedText,
+                    style: TextStyle(fontSize: 16), // Adjust font size as needed
+                  ),
+                ),
+              )
+            )
+          ),
+          Expanded(
+              flex: 35,
+              child: Container(
+                  margin: EdgeInsets.only(top: 20, bottom: 20, left: 15, right: 15),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: SingleChildScrollView(
+                      child: Text(
+                        _recognizedText,
+                        style: TextStyle(fontSize: 16), // Adjust font size as needed
+                      ),
+                    ),
+                  )
+              )
           ),
           Expanded(
             flex: 10,
