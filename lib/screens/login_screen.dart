@@ -135,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                          height: 56,
                          child: FilledButton.tonal(
                              onPressed:(){
-                               context.go('/');
+                               context.go('/login/signUp');
                              },
                              style: ButtonStyle(
                                shape: WidgetStateProperty.all<RoundedRectangleBorder>(

@@ -11,13 +11,26 @@ class HomeNavigationBar extends StatelessWidget {
     final String location = GoRouterState.of(context).uri.path;
 
     return Scaffold(
-      body: child,
-      bottomNavigationBar: NavigationBar(
+      body: Stack(
+        children: [
+          child, // Your main body content here
+          if (location != '/settings') // Only show button on non-settings pages
+            Positioned(
+              top: 30.0, // Distance from the top edge of the screen
+              right: 0.0, // Distance from the right edge of the screen
+              child: IconButton(
+                onPressed: () => context.push('/settings'),
+                icon: Icon(Icons.settings),
+              ),
+            ),
+        ],
+      ),
+      bottomNavigationBar: location != 'settings'
+        ? NavigationBar(
         selectedIndex: _getIndex(location), // Determine selected tab
         onDestinationSelected: (index) {
           context.go(_getPath(index)); // Navigate on tap
         },
-        indicatorColor: Colors.blue.withOpacity(0.2),
         destinations: const [
           NavigationDestination(icon: Icon(Icons.flatware), label: 'Recipes'),
           NavigationDestination(icon: Icon(Icons.inventory_2), label: 'Inventory'),
@@ -25,13 +38,8 @@ class HomeNavigationBar extends StatelessWidget {
           NavigationDestination(icon: Icon(Icons.crop_free), label: 'Scan'),
           NavigationDestination(icon: Icon(Icons.notification_add), label: 'Notifications'),
         ],
-      ),
-      /*floatingActionButton: location != '/settings'
-          ? FloatingActionButton(
-            onPressed: () => context.go('/settings'),
-            child: const Icon(Icons.settings),
-          )
-          : null, */
+      )
+          : null,
     );
   }
 

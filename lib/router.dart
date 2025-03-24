@@ -13,6 +13,7 @@ import 'package:food_manager/screens/recipes_screen.dart';
 import 'package:food_manager/screens/reset_password.dart';
 import 'package:food_manager/screens/scanning_screen.dart';
 import 'package:food_manager/screens/settings_screen.dart';
+import 'package:food_manager/screens/sign_up_screen.dart';
 import 'package:food_manager/screens/viewReceiptScreen.dart';
 import 'package:food_manager/widgets/homeNavigationBar.dart';
 import 'package:go_router/go_router.dart';
@@ -102,11 +103,6 @@ final GoRouter _router =  GoRouter(
                     ),
                   ]
               ),
-              GoRoute(
-                name: "settings",
-                path: 'settings',
-                builder: (context, state) => SettingsScreen(title: "Settings"),
-              )
             ]
           ),
         ],
@@ -128,6 +124,11 @@ final GoRouter _router =  GoRouter(
               ),
             ]
           ),
+          GoRoute(
+            name: "signUp",
+            path: 'signUp',
+            builder: (context, state) => SignUpScreen(title: "Sign Up"),
+          )
         ]
       ),
       GoRoute(
@@ -138,8 +139,13 @@ final GoRouter _router =  GoRouter(
           final file = state.extra as File?;
           return ViewReceiptScreen(imageFile: file);
         },
-
       ),
+      GoRoute(
+        name: "settings",
+        path: 'settings',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => SettingsScreen(title: "Settings"),
+      )
     ]
 );
 
