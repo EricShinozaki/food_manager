@@ -11,6 +11,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final passwordController = TextEditingController();
+  final emailController =  TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,19 +22,21 @@ class _LoginScreenState extends State<LoginScreen> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
+      resizeToAvoidBottomInset: false,
       body: Column(
          children: [
            Expanded(
-             flex: 40,
+             flex: 20,
              child:
                Image(
                  image: NetworkImage(
-                   'https://cdn.pixabay.com/photo/2024/02/23/08/27/apple-8591539_1280.jpg',
-                 )
+                   'https://cdn.pixabay.com/photo/2024/02/23/08/27/apple-8591539_1280.jpg'
+                 ),
+                 fit: BoxFit.cover
                ),
            ),
            Expanded(
-             flex: 50,
+             flex: 80,
              child: Column(
                children: [
                  Container(
@@ -48,9 +53,10 @@ class _LoginScreenState extends State<LoginScreen> {
                    margin: EdgeInsets.only(left: 35, right: 35, bottom: 10, top: 10),
                    child: TextField(
                     obscureText: false,
+                    controller:  emailController,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                       labelText: 'Email',
                       prefixIcon: Icon(Icons.email),
@@ -58,12 +64,13 @@ class _LoginScreenState extends State<LoginScreen> {
                    ),
                  ),
                  Container(
-                   margin: EdgeInsets.only(left: 35, right: 35, bottom: 10, top: 10),
+                   margin: EdgeInsets.only(left: 35, right: 35, top: 10),
                    child: TextField(
                      obscureText: true,
+                     controller: passwordController,
                      decoration: InputDecoration(
                        border: OutlineInputBorder(
-                         borderRadius: BorderRadius.circular(30),
+                         borderRadius: BorderRadius.circular(20),
                        ),
                        labelText: 'Password',
                        prefixIcon: Icon(Icons.password)
@@ -71,32 +78,95 @@ class _LoginScreenState extends State<LoginScreen> {
                    ),
                  ),
                  Container(
+                     margin: EdgeInsets.only(left: 180, right: 35),
+                     child: TextButton(
+                       onPressed: () => context.go('/login/forgotPassword'),
+                       child: const Text('Forgot Password?'),
+                     )
+                 ),
+                 Container(
                    margin: EdgeInsets.only(left: 35, right: 35),
-                   child: FilledButton.tonal(
-                     child: Text("Login"),
-                     onPressed:(){
-                       context.go('/');
-                     },
+                   child: SizedBox(
+                       width: double.infinity,
+                       height: 56,
+                       child: FilledButton.tonal(
+                         onPressed:(){
+                           context.go('/');
+                         },
+                         style: ButtonStyle(
+                             shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                                 RoundedRectangleBorder(
+                                     borderRadius: BorderRadius.circular(20.0),
+                                 )
+                             ),
+                           backgroundColor: WidgetStateProperty.all(Colors.lightBlueAccent),
+                         ),
+                         child: Text("Login")
+                       )
                    )
                  ),
                  Container(
-                   margin: EdgeInsets.only(left: 35, right: 35, bottom: 10, top: 10),
-                   child: TextButton(
-                     onPressed: () => context.go('/login/forgotPassword'),
-                     child: const Text('Forgot Password?'),
+                   margin: EdgeInsets.only(left: 35, right: 35, top: 20, bottom: 20),
+                   child: Row(
+                     children: [
+                       Expanded(
+                           child: Divider(
+                             thickness: 1,
+                             color: Colors.black,
+                           )
+                       ),
+                       Padding(
+                           padding: EdgeInsets.symmetric(horizontal: 8.0),
+                           child: Text('Or'),
+                       ),
+                       Expanded(
+                           child: Divider(
+                             thickness: 1,
+                             color: Colors.black,
+                           )
+                       )
+                     ],
                    )
+                 ),
+                 Container(
+                     margin: EdgeInsets.only(left: 35, right: 35),
+                     child: SizedBox(
+                         width: double.infinity,
+                         height: 56,
+                         child: FilledButton.tonal(
+                             onPressed:(){
+                               context.go('/');
+                             },
+                             style: ButtonStyle(
+                               shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                                   RoundedRectangleBorder(
+                                     borderRadius: BorderRadius.circular(20.0),
+                                     side: BorderSide(color: Colors.black),
+                                   )
+                               ),
+                               backgroundColor: WidgetStateProperty.all(Colors.white),
+                             ),
+                             child: Text("Sign Up")
+                         )
+                     )
                  ),
                ],
              ),
-           ),
-           Expanded(
-             flex: 10,
-             child: Row(
-               children: [
-                 Text('App Logo')
-               ],
-             )
            )
+           /*
+           FloatingActionButton(
+             onPressed: () {
+               showDialog(
+                 context: context,
+                 builder: (context) {
+                   return AlertDialog(
+                     content: Text("password: ${passwordController.text} email: ${emailController.text}"),
+                   );
+                 },
+               );
+             }
+           )
+           */
          ],
       ),
     );
