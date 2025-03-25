@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -13,6 +14,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final passwordController = TextEditingController();
   final emailController =  TextEditingController();
+  String loginButtonText = "Login";
 
   @override
   Widget build(BuildContext context) {
@@ -90,8 +92,40 @@ class _LoginScreenState extends State<LoginScreen> {
                        width: double.infinity,
                        height: 56,
                        child: FilledButton.tonal(
-                         onPressed:(){
-                           context.go('/');
+                         onPressed:() async {
+                           try {
+                             final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+                                 email: emailController.text,
+                                 password: passwordController.text,
+                             );
+
+                             setState(() {
+                               loginButtonText = "Login Successful";
+                             });
+
+                             await Future.delayed(Duration(seconds: 2));
+
+                             if (!context.mounted) return;  // Prevents navigation if widget is unmounted
+                             context.go('/');
+                           } on FirebaseAuthException catch (e) {
+                             if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+                               setState(() {
+                                 loginButtonText = "Incorrect email or password";
+                               });
+                               await Future.delayed(Duration(seconds: 3));
+                               setState(() {
+                                 loginButtonText = "Login";
+                               });
+                             } else {
+                               setState(() {
+                                 loginButtonText = "Invalid email or password";
+                               });
+                               await Future.delayed(Duration(seconds: 3));
+                               setState(() {
+                                 loginButtonText = "Login";
+                               });
+                             }
+                           }
                          },
                          style: ButtonStyle(
                              shape: WidgetStateProperty.all<RoundedRectangleBorder>(
@@ -101,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                              ),
                            backgroundColor: WidgetStateProperty.all(Colors.lightBlueAccent),
                          ),
-                         child: Text("Login")
+                         child: Text(loginButtonText),
                        )
                    )
                  ),

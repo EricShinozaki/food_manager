@@ -118,50 +118,57 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               String emailText = emailController.text;
                               String passwordText = passwordController.text;
                               String confirmPasswordText = confirmPasswordController.text;
-                              if(emailText.isEmpty || passwordText.isEmpty || confirmPasswordText.isEmpty){
+
+                              // Validate input fields
+                              if (emailText.isEmpty || passwordText.isEmpty || confirmPasswordText.isEmpty) {
                                 setState(() {
                                   errorMessage = "Please fill out all fields";
                                 });
-                              } else if(passwordText != confirmPasswordText){
-                                setState(() {
-                                  errorMessage = "Password does not match";
-                                });
-                              } else {
-                                try {
-                                  final credential = await FirebaseAuth.instance
-                                      .createUserWithEmailAndPassword(
-                                    email: emailText,
-                                    password: passwordText,
-                                  );
-                                  setState(() {
-                                    errorMessage = ""; // Clear error on success
-                                  });
-                                } on FirebaseAuthException catch (e) {
-                                  setState(() {
-                                    if (e.code == 'weak-password') {
-                                      errorMessage =
-                                      'The password provided is too weak.';
-                                    } else
-                                    if (e.code == 'email-already-in-use') {
-                                      errorMessage =
-                                      'The account already exists for that email.';
-                                    }
-                                  });
-                                } catch (e) {
-                                  setState(() {
-                                    errorMessage = e.toString();
-                                  });
-                                }
+                                return; // Stop execution
                               }
 
-                              if(errorMessage.isEmpty){
-                                errorMessage = "Successfully created account";
+                              if (passwordText != confirmPasswordText) {
+                                setState(() {
+                                  errorMessage = "Passwords do not match";
+                                });
+                                return;
                               }
 
-                              Future.delayed(Duration(seconds: 3), () {
+                              try {
+                                final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                                  email: emailText,
+                                  password: passwordText,
+                                );
+
                                 setState(() {
-                                  errorMessage = "";
+                                  errorMessage = "Successfully created account!";
                                 });
+
+                                // Delay before navigation
+                                await Future.delayed(Duration(seconds: 3));
+
+                                if (!context.mounted) return;  // Prevents navigation if widget is unmounted
+                                context.go('/login');
+                              } on FirebaseAuthException catch (e) {
+                                setState(() {
+                                  if (e.code == 'weak-password') {
+                                    errorMessage = 'The password provided is too weak.';
+                                  } else if (e.code == 'email-already-in-use') {
+                                    errorMessage = 'The account already exists for that email.';
+                                  } else {
+                                    errorMessage = "An unknown error occurred.";
+                                  }
+                                });
+                              } catch (e) {
+                                setState(() {
+                                  errorMessage = e.toString();
+                                });
+                              }
+
+                              await Future.delayed(Duration(seconds: 3));
+
+                              setState(() {
+                                errorMessage = "";
                               });
                             },
                             style: ButtonStyle(

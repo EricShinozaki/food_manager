@@ -142,7 +142,7 @@ final GoRouter _router =  GoRouter(
       ),
       GoRoute(
         name: "settings",
-        path: 'settings',
+        path: '/settings',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => SettingsScreen(title: "Settings"),
       )
