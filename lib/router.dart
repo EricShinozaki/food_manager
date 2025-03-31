@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:food_manager/screens/add_item_screen.dart';
 import 'package:food_manager/screens/add_recipe_screen.dart';
 import 'package:food_manager/screens/forgot_password.dart';
 import 'package:food_manager/screens/home_screen.dart';
@@ -89,6 +90,11 @@ final GoRouter _router =  GoRouter(
                         return ItemDetailsScreen(title: ingredientName);
                       }
                     ),
+                    GoRoute(
+                      name: "addItem",
+                      path: 'addItem',
+                      builder: (context, state) => AddItemScreen(title: "Add item"),
+                    )
                   ]
               ),
               GoRoute(

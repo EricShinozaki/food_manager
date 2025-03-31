@@ -32,6 +32,11 @@ class _InventoryScreenState extends State<InventoryScreen> {
           );
         }
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.go('/inventory/addItem'),
+        tooltip: 'Add item',
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

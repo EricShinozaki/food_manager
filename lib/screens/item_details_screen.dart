@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:food_manager/ItemProvider.dart';
+import 'package:go_router/go_router.dart';
 
 class ItemDetailsScreen extends StatefulWidget {
   const ItemDetailsScreen({super.key, required this.title});
