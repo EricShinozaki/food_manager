@@ -30,6 +30,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
     }
   }
 
+  void addItem() {}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,9 +122,18 @@ class _AddItemScreenState extends State<AddItemScreen> {
             ...nutritionData.map((data) => Text(data)),
           ]),
           Container(
-            padding: EdgeInsets.all(20),
-            child: Text("tempButtonSection"),
-          )
+              padding: EdgeInsets.all(20),
+              child: FilledButton.tonal(
+                  onPressed: addItem,
+                  style: ButtonStyle(
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                      side: BorderSide(color: Colors.black),
+                    )),
+                    backgroundColor: WidgetStateProperty.all(Colors.white),
+                  ),
+                  child: Text("Add item")))
         ])));
   }
 }

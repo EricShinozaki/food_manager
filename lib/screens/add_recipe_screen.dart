@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:food_manager/ItemProvider.dart';
 
 class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({super.key, required this.title});
@@ -10,6 +11,12 @@ class AddRecipeScreen extends StatefulWidget {
 }
 
 class _AddRecipeScreenState extends State<AddRecipeScreen> {
+  final nameController = TextEditingController();
+  final servingsController = TextEditingController();
+  final ingredientsController = TextEditingController();
+  final instructionController = TextEditingController();
+  final nutritionController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
