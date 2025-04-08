@@ -6,14 +6,14 @@ class Recipe {
   double servings;
   List<Item> ingredients;
   String instructions;
-  Map<String, int>? nutrition;
+  List<String> nutrition;
 
   Recipe({
     required this.name,
     required this.servings,
     required this.ingredients,
     required this.instructions,
-    this.nutrition,
+    this.nutrition = const [],
   });
 }
 
@@ -31,7 +31,7 @@ class RecipeProvider with ChangeNotifier {
         Item(name: "Black Pepper", quantity: 1, unit: "tsp", note: "Freshly ground for best flavor."),
       ],
       instructions: "Cook spaghetti. Fry pancetta. Mix eggs and cheese. Combine everything.",
-      nutrition: {"Calories": 700, "Protein": 40, "Carbs": 60, "Fat": 30},
+      nutrition: ["Calories: 700", "Protein: 40g", "Carbs: 60g", "Fat: 30g"],
     ),
     Recipe(
       name: "Chicken Stir Fry",
@@ -44,7 +44,7 @@ class RecipeProvider with ChangeNotifier {
         Item(name: "Ginger", quantity: 1, unit: "tsp", note: "Freshly grated is best."),
       ],
       instructions: "Slice chicken and veggies. Stir-fry with garlic and ginger. Add soy sauce.",
-      nutrition: {"Calories": 450, "Protein": 50, "Carbs": 20, "Fat": 15},
+      nutrition: ["Calories: 450", "Protein: 50g", "Carbs: 20g", "Fat: 15g"],
     ),
     Recipe(
       name: "Pancakes",
@@ -57,7 +57,7 @@ class RecipeProvider with ChangeNotifier {
         Item(name: "Baking Powder", quantity: 1, unit: "tsp", note: "Ensures fluffy pancakes."),
       ],
       instructions: "Mix ingredients. Cook in a pan until golden brown on both sides.",
-      nutrition: {"Calories": 350, "Protein": 10, "Carbs": 60, "Fat": 8},
+      nutrition: ["Calories: 350", "Protein: 10g", "Carbs: 60g", "Fat: 8g"],
     ),
     Recipe(
       name: "Avocado Toast",
@@ -69,7 +69,7 @@ class RecipeProvider with ChangeNotifier {
         Item(name: "Lemon Juice", quantity: 1, unit: "tsp", note: "Prevents browning."),
       ],
       instructions: "Mash avocado with lemon and salt. Spread on toasted bread.",
-      nutrition: {"Calories": 300, "Protein": 6, "Carbs": 30, "Fat": 18},
+      nutrition: ["Calories: 300", "Protein: 6g", "Carbs: 30g", "Fat: 18g"],
     ),
     Recipe(
       name: "Banana Smoothie",
@@ -81,7 +81,7 @@ class RecipeProvider with ChangeNotifier {
         Item(name: "Yogurt", quantity: 100, unit: "g", note: "Adds creaminess and probiotics."),
       ],
       instructions: "Blend all ingredients until smooth.",
-      nutrition: {"Calories": 200, "Protein": 8, "Carbs": 40, "Fat": 3},
+      nutrition: ["Calories: 200", "Protein: 8g", "Carbs: 40g", "Fat: 3g"],
     ),
     Recipe(
       name: "Vegetable Soup",
@@ -94,7 +94,7 @@ class RecipeProvider with ChangeNotifier {
         Item(name: "Garlic", quantity: 2, unit: "cloves", note: "Adds depth of flavor."),
       ],
       instructions: "Chop vegetables. Simmer in broth until tender. Season to taste.",
-      nutrition: {"Calories": 150, "Protein": 5, "Carbs": 30, "Fat": 2},
+      nutrition: ["Calories: 150", "Protein: 5g", "Carbs: 30g", "Fat: 2g"],
     ),
     Recipe(
       name: "Grilled Cheese Sandwich",
@@ -105,7 +105,7 @@ class RecipeProvider with ChangeNotifier {
         Item(name: "Butter", quantity: 1, unit: "tbsp", note: "Spread evenly on bread."),
       ],
       instructions: "Butter bread. Add cheese. Grill until golden brown on both sides.",
-      nutrition: {"Calories": 400, "Protein": 12, "Carbs": 35, "Fat": 22},
+      nutrition: ["Calories: 400", "Protein: 12g", "Carbs: 35g", "Fat: 22g"],
     ),
     Recipe(
       name: "Omelette",
@@ -117,7 +117,7 @@ class RecipeProvider with ChangeNotifier {
         Item(name: "Spinach", quantity: 20, unit: "g", note: "Fresh or frozen both work."),
       ],
       instructions: "Whisk eggs. Cook in a pan. Add cheese and spinach. Fold and serve.",
-      nutrition: {"Calories": 250, "Protein": 20, "Carbs": 5, "Fat": 18},
+      nutrition: ["Calories: 250", "Protein: 20g", "Carbs: 5g", "Fat: 18g"],
     ),
     Recipe(
       name: "Caesar Salad",
@@ -129,7 +129,7 @@ class RecipeProvider with ChangeNotifier {
         Item(name: "Caesar Dressing", quantity: 3, unit: "tbsp", note: "Use a high-quality dressing."),
       ],
       instructions: "Toss lettuce, cheese, croutons, and dressing together.",
-      nutrition: {"Calories": 350, "Protein": 10, "Carbs": 20, "Fat": 25},
+      nutrition: ["Calories: 350", "Protein: 10g", "Carbs: 20g", "Fat: 25g"],
     ),
     Recipe(
       name: "Fruit Salad",
@@ -141,9 +141,10 @@ class RecipeProvider with ChangeNotifier {
         Item(name: "Honey", quantity: 1, unit: "tbsp", note: "Optional for added sweetness."),
       ],
       instructions: "Mix all fruits together. Drizzle with honey if desired.",
-      nutrition: {"Calories": 200, "Protein": 2, "Carbs": 45, "Fat": 1},
+      nutrition: ["Calories: 200", "Protein: 2g", "Carbs: 45g", "Fat: 1g"],
     ),
   ];
+
 
   void addRecipe(Recipe recipe){
     recipes.add(recipe);

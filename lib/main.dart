@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:food_manager/ItemProvider.dart';
 import 'package:food_manager/router.dart';
@@ -8,7 +9,7 @@ import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'package:flutter/services.dart';
 
-late CameraDescription _firstCamera;
+late FirebaseFirestore _firestore;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,13 +19,11 @@ Future<void> main() async {
   ]);
 
   WidgetsFlutterBinding.ensureInitialized();
-  final cameras = await availableCameras();
-  _firstCamera = cameras.first;
-
-  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  _firestore = FirebaseFirestore.instance;
+
   runApp(
     ChangeNotifierProvider(
       create: (context) => ItemProvider(),
@@ -34,7 +33,7 @@ Future<void> main() async {
 
 }
 
-CameraDescription get camera => _firstCamera;
+FirebaseFirestore get db => _firestore;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

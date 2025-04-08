@@ -42,17 +42,17 @@ class _AddItemScreenState extends State<AddItemScreen> {
         resizeToAvoidBottomInset: false,
         body: SingleChildScrollView(
             child: Column(children: [
-          Column(children: [
-            Container(
-              margin: EdgeInsets.only(top: 15, bottom: 5, left: 20, right: 20),
-              child: TextField(
-                obscureText: false,
-                controller: nameController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  labelText: 'Item Name',
+              Column(children: [
+                Container(
+                  margin: EdgeInsets.only(top: 15, bottom: 5, left: 20, right: 20),
+                  child: TextField(
+                    obscureText: false,
+                    controller: nameController,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    labelText: 'Item Name',
                 ),
               ),
             ),
@@ -134,6 +134,9 @@ class _AddItemScreenState extends State<AddItemScreen> {
                     backgroundColor: WidgetStateProperty.all(Colors.white),
                   ),
                   child: Text("Add item")))
-        ])));
+            ]
+            )
+        )
+    );
   }
 }
