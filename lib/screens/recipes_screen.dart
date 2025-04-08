@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:food_manager/recipeProvider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class RecipesScreen extends StatefulWidget {
   const RecipesScreen({super.key, required this.title});
@@ -14,15 +15,17 @@ class RecipesScreen extends StatefulWidget {
 class _RecipesScreenState extends State<RecipesScreen> {
   @override
   Widget build(BuildContext context) {
+    final recipeProvider = Provider.of<RecipeProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
       body: ListView.builder(
-          itemCount: RecipeProvider().recipes.length,
+          itemCount: recipeProvider.recipes.length,
           itemBuilder: (context, index){
-            final recipe = RecipeProvider().recipes[index];
+            final recipe = recipeProvider.recipes[index];
             return ListTile(
                 title: Text(recipe.name, style: TextStyle(fontSize: 20)),
                 subtitle: Text("Servings: ${recipe.servings}", style: TextStyle(fontSize: 15)),

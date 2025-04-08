@@ -37,7 +37,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
     double? quantity = parseQuantity();
     double quantityAsDouble = quantity ?? 0.0;
 
-    Item item = new Item(
+    Item item = Item(
       name: nameController.text,
       quantity: quantityAsDouble,
       unit: unitController.text,
@@ -48,41 +48,38 @@ class _AddItemScreenState extends State<AddItemScreen> {
     await itemProvider.addItem(item);
   }
 
-  double? parseQuantity(){
+  double? parseQuantity() {
     final quantityText = quantityController.text;
     final value = double.tryParse(quantityText);
-
     return value;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: Text(widget.title),
-        ),
-        resizeToAvoidBottomInset: false,
-        body: SingleChildScrollView(
-            child: Column(children: [
-              Column(children: [
-                Container(
-                  margin: EdgeInsets.only(top: 15, bottom: 5, left: 20, right: 20),
-                  child: TextField(
-                    obscureText: false,
-                    controller: nameController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    labelText: 'Item Name',
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(widget.title),
+      ),
+      resizeToAvoidBottomInset: false,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              child: TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  labelText: 'Item Name',
                 ),
               ),
             ),
             Container(
-              margin: EdgeInsets.only(top: 5, bottom: 5, left: 20, right: 20),
+              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               child: TextField(
-                obscureText: false,
                 controller: quantityController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
@@ -93,9 +90,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
               ),
             ),
             Container(
-              margin: EdgeInsets.only(top: 5, bottom: 5, left: 20, right: 20),
+              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               child: TextField(
-                obscureText: false,
                 controller: unitController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
@@ -106,9 +102,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
               ),
             ),
             Container(
-              margin: EdgeInsets.only(top: 5, bottom: 5, left: 20, right: 20),
+              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               child: TextField(
-                obscureText: false,
                 controller: noteController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
@@ -119,47 +114,58 @@ class _AddItemScreenState extends State<AddItemScreen> {
               ),
             ),
             Container(
-                margin: EdgeInsets.only(top: 5, bottom: 5, left: 20, right: 20),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        obscureText: false,
-                        controller: nutritionController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          labelText: 'Nutrition',
-                          suffixIcon: IconButton(
-                            icon: Icon(Icons.add),
-                            onPressed: addNutrition,
-                          ),
+              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: nutritionController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        labelText: 'Nutrition',
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.add),
+                          onPressed: addNutrition,
                         ),
                       ),
-                    )
-                  ],
-                )),
-            SizedBox(height: 20),
-            Text("Added Nutrition Data:"),
-            ...nutritionData.map((data) => Text(data)),
-          ]),
-          Container(
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.only(top: 15, bottom: 5, left: 40, right: 20),
+              alignment: Alignment.centerLeft,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Added Nutrition Data:"),
+                  ...nutritionData.map((data) => Text(data)).toList(),
+                ],
+              ),
+            ),
+            Container(
               padding: EdgeInsets.all(20),
               child: FilledButton.tonal(
-                  onPressed: add,
-                  style: ButtonStyle(
-                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
+                onPressed: add,
+                style: ButtonStyle(
+                  shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20.0),
                       side: BorderSide(color: Colors.black),
-                    )),
-                    backgroundColor: WidgetStateProperty.all(Colors.white),
+                    ),
                   ),
-                  child: Text("Add item")))
-            ]
-            )
-        )
+                  backgroundColor: WidgetStateProperty.all(Colors.white),
+                ),
+                child: Text("Add item"),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
+

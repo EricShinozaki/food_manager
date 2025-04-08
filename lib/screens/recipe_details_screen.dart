@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:food_manager/recipeProvider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class RecipeDetailsScreen extends StatefulWidget {
   const RecipeDetailsScreen({super.key, required this.title});
@@ -14,7 +15,8 @@ class RecipeDetailsScreen extends StatefulWidget {
 class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
   @override
   Widget build(BuildContext context) {
-    final recipe = RecipeProvider().recipes.firstWhere((recipe) => recipe.name == widget.title);
+    final recipeProvider = Provider.of<RecipeProvider>(context);
+    final recipe = recipeProvider.recipes.firstWhere((recipe) => recipe.name == widget.title);
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,

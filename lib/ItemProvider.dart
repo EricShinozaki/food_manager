@@ -19,6 +19,26 @@ class Item {
     required this.note, // Reminder, this can be left as empty string if no note
     this.nutrition = const [],
   });
+
+  factory Item.fromFireStore(Map<String, dynamic> data){
+    return Item(
+      name: data['name'],
+      quantity: data['quantity'].toDouble(),
+      unit: data['unit'],
+      note: data['note'],
+      nutrition: List<String>.from(['nutrition']),
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'quantity': quantity,
+      'unit': unit,
+      'note': note,
+      'nutrition': nutrition,
+    };
+  }
 }
 
 class ItemProvider with ChangeNotifier {
