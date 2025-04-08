@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:food_manager/ItemProvider.dart';
+import 'package:provider/provider.dart';
 
 class AddItemScreen extends StatefulWidget {
   const AddItemScreen({super.key, required this.title});
@@ -30,7 +32,28 @@ class _AddItemScreenState extends State<AddItemScreen> {
     }
   }
 
-  void addItem() {}
+  Future<void> add() async {
+    final itemProvider = Provider.of<ItemProvider>(context, listen: false);
+    double? quantity = parseQuantity();
+    double quantityAsDouble = quantity ?? 0.0;
+
+    Item item = new Item(
+      name: nameController.text,
+      quantity: quantityAsDouble,
+      unit: unitController.text,
+      note: noteController.text,
+      nutrition: nutritionData,
+    );
+
+    await itemProvider.addItem(item);
+  }
+
+  double? parseQuantity(){
+    final quantityText = quantityController.text;
+    final value = double.tryParse(quantityText);
+
+    return value;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +147,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
           Container(
               padding: EdgeInsets.all(20),
               child: FilledButton.tonal(
-                  onPressed: addItem,
+                  onPressed: add,
                   style: ButtonStyle(
                     shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(

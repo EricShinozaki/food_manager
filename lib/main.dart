@@ -2,9 +2,11 @@ import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:food_manager/ItemProvider.dart';
+import 'package:food_manager/recipeProvider.dart';
 import 'package:food_manager/router.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'package:flutter/services.dart';
@@ -25,8 +27,12 @@ Future<void> main() async {
   _firestore = FirebaseFirestore.instance;
 
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => ItemProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => ItemProvider()), // ItemProvider
+        ChangeNotifierProvider(create: (context) => RecipeProvider()), // AuthProvider
+        // Add other providers here as needed
+      ],
       child: MyApp(),
     ),
   );
@@ -40,6 +46,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<ItemProvider>(context, listen: false).fetchItems();
     return MaterialApp.router(
       routerConfig: router,
       title: 'Flutter Demo',
