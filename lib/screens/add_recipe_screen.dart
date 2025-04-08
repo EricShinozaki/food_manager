@@ -19,8 +19,12 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   final instructionController = TextEditingController();
   final nutritionController = TextEditingController();
 
+  final unitController = TextEditingController();
+  final ingredientNameController = TextEditingController();
+  final quantityController = TextEditingController();
+
   List<String> nutritionData = [];
-  List<String> ingredientList = [];
+  List<Item> ingredientList = [];
 
   void addNutrition(){
     final nutritionItem = nutritionController.text;
@@ -35,15 +39,26 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   }
 
   void addIngredientToRecipe(){
-    final ingredient = ingredientsController.text;
+    final ingredient = ingredientNameController.text;
+    final unit = unitController.text;
+    double? quantity = parseQuantity();
+    double quantityAsDouble = quantity ?? 0.0;
 
     if(ingredient.isNotEmpty){
       setState(() {
-        ingredientList.add(ingredient);
+        ingredientList.add(new Item(name: ingredient, quantity: quantityAsDouble, unit: unit, note: ''));
       });
     }
 
-    ingredientsController.clear();
+    unitController.clear();
+    ingredientNameController.clear();
+    quantityController.clear();
+  }
+
+  double? parseQuantity() {
+    final quantityText = quantityController.text;
+    final value = double.tryParse(quantityText);
+    return value;
   }
 
   Future<void> add() async {
@@ -54,7 +69,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     Recipe recipe = Recipe(
       name: nameController.text,
       servings: servingsAsInt,
-      ingredients: ingredientList.map((data) => Item(name: data, quantity: 0.0, unit: "N/A", note: "N/A")).toList(),
+      ingredients: ingredientList,
       instructions: instructionController.text,
       nutrition: nutritionData,
     );
@@ -111,31 +126,56 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                       ),
                     ),
                   ),Container(
-                      margin: EdgeInsets.only(top: 15, bottom: 5, left: 20, right: 20),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              obscureText: false,
-                              controller: ingredientsController,
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20
+                    margin: EdgeInsets.only(top: 15, bottom: 5, left: 20, right: 20),
+                    child: Row(
+                      children: [
+                        // Name TextField
+                        Expanded(
+                          child: TextField(
+                            controller: ingredientNameController,
+                            style: TextStyle(color: Colors.black, fontSize: 20),
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
                               ),
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                labelText: 'Ingredient',
-                                suffixIcon: IconButton(
-                                  icon: Icon(Icons.add),
-                                  onPressed: addIngredientToRecipe,
-                                ),
-                              ),
+                              labelText: 'Ingredient',
                             ),
-                          )
-                        ],
-                      )
+                          ),
+                        ),
+                        SizedBox(width: 10), // Spacing between text fields
+                        // Quantity TextField
+                        Expanded(
+                          child: TextField(
+                            controller: quantityController,
+                            style: TextStyle(color: Colors.black, fontSize: 20),
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              labelText: 'Quantity',
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10), // Spacing between text fields
+                        // Unit TextField
+                        Expanded(
+                          child: TextField(
+                            controller: unitController,
+                            style: TextStyle(color: Colors.black, fontSize: 20),
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              labelText: 'Unit',
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.add),
+                          onPressed: addIngredientToRecipe,
+                        ),
+                      ],
+                    ),
                   ),
                   Container(
                     margin: EdgeInsets.only(top: 15, bottom: 5, left: 40, right: 20),
@@ -156,7 +196,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                             SizedBox(height: 10),
                             ...ingredientList.asMap().entries.map((entry) {
                               int index = entry.key;
-                              String data = entry.value;
+                              Item data = entry.value;
 
                               return Container(
                                 margin: EdgeInsets.only(bottom: 8),
@@ -170,7 +210,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   title: Text(
-                                    data,
+                                    "${data.quantity} ${data.unit} ${data.name}",
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 20
