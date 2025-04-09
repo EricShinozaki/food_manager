@@ -59,7 +59,7 @@ class RecipeProvider with ChangeNotifier {
   }
 
     // Add recipe for logged-in user
-  Future<void> addRecipe(Recipe recipe) async {
+  Future<String> addRecipe(Recipe recipe) async {
     try {
       final existingRecipeSnapshot = await database
           .collection('users')
@@ -87,12 +87,16 @@ class RecipeProvider with ChangeNotifier {
         if (kDebugMode) {
           print("Recipe with this name already exists");
         }
+        return "Recipe with this name already exists.";
       }
     } catch (error) {
       if (kDebugMode) {
         print("Failed to add recipe: $error");
       }
+      return "Error: $error, please try again";
     }
+
+    return "Successfully added recipe";
   }
 
   // Remove a recipe from Firestore by name for the logged-in user

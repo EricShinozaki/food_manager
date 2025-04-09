@@ -26,6 +26,9 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   List<String> nutritionData = [];
   List<Item> ingredientList = [];
 
+  final _formKey = GlobalKey<FormState>();
+  final _ingredientFormKey = GlobalKey<FormState>();
+
   void addNutrition(){
     final nutritionItem = nutritionController.text;
 
@@ -61,7 +64,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     return value;
   }
 
-  Future<void> add() async {
+  Future<String> add() async {
     final recipeProvider = Provider.of<RecipeProvider>(context, listen: false);
     double? servings = parseServings();
     double servingsAsInt = servings ?? 0.0;
@@ -74,13 +77,37 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       nutrition: nutritionData,
     );
 
-    await recipeProvider.addRecipe(recipe);
+    return await recipeProvider.addRecipe(recipe);
   }
 
   double? parseServings() {
     final servingsText = servingsController.text;
     final value = double.tryParse(servingsText);
     return value;
+  }
+
+  String? _requiredValidator(String? value) {
+    if(value == null || value.trim().isEmpty){
+      return 'This field is required';
+    }
+    return null;
+  }
+
+  String? _ingredientRequiredValidator(String? value) {
+    if(value == null || value.trim().isEmpty){
+      return 'Required';
+    }
+    return null;
+  }
+
+  String? _requiredDoubleValidator(String? value) {
+    double? servings = parseServings();
+
+    if(servings == null){
+      return 'required';
+    }
+
+    return null;
   }
 
   @override
@@ -91,11 +118,14 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
           title: Text(widget.title),
         ),
         body: SingleChildScrollView(
-            child: Column(
+            child: Form(
+              key: _formKey,
+              child: Column(
                 children: [
                   Container(
                     margin: EdgeInsets.only(top: 15, bottom: 5, left: 20, right: 20),
-                    child: TextField(
+                    child: TextFormField(
+                      validator: _requiredValidator,
                       obscureText: false,
                       controller: nameController,
                       style: TextStyle(
@@ -127,55 +157,67 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                     ),
                   ),Container(
                     margin: EdgeInsets.only(top: 15, bottom: 5, left: 20, right: 20),
-                    child: Row(
-                      children: [
-                        // Name TextField
-                        Expanded(
-                          child: TextField(
-                            controller: ingredientNameController,
-                            style: TextStyle(color: Colors.black, fontSize: 20),
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20),
+                    child: Form(
+                      key: _ingredientFormKey,
+                      child: Row(
+                        children: [
+                          // Name TextField
+                          Expanded(
+                            child: TextFormField(
+                              validator: _ingredientRequiredValidator,
+                              controller: ingredientNameController,
+                              style: TextStyle(color: Colors.black, fontSize: 20),
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                labelText: 'Ingredient',
                               ),
-                              labelText: 'Ingredient',
                             ),
                           ),
-                        ),
-                        SizedBox(width: 10), // Spacing between text fields
-                        // Quantity TextField
-                        Expanded(
-                          child: TextField(
-                            controller: quantityController,
-                            style: TextStyle(color: Colors.black, fontSize: 20),
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20),
+                          SizedBox(width: 10), // Spacing between text fields
+                          // Quantity TextField
+                          Expanded(
+                            child: TextFormField(
+                              validator: _ingredientRequiredValidator,
+                              controller: quantityController,
+                              style: TextStyle(color: Colors.black, fontSize: 20),
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                labelText: 'Quantity',
                               ),
-                              labelText: 'Quantity',
                             ),
                           ),
-                        ),
-                        SizedBox(width: 10), // Spacing between text fields
-                        // Unit TextField
-                        Expanded(
-                          child: TextField(
-                            controller: unitController,
-                            style: TextStyle(color: Colors.black, fontSize: 20),
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20),
+                          SizedBox(width: 10), // Spacing between text fields
+                          // Unit TextField
+                          Expanded(
+                            child: TextFormField(
+                              validator: _ingredientRequiredValidator,
+                              controller: unitController,
+                              style: TextStyle(color: Colors.black, fontSize: 20),
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                labelText: 'Unit',
                               ),
-                              labelText: 'Unit',
                             ),
                           ),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.add),
-                          onPressed: addIngredientToRecipe,
-                        ),
-                      ],
-                    ),
+                          IconButton(
+                            icon: Icon(Icons.add),
+                            onPressed: () {
+                              if(_ingredientFormKey.currentState!.validate()){
+                                setState(() {
+                                  addIngredientToRecipe();
+                                });
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    )
                   ),
                   Container(
                     margin: EdgeInsets.only(top: 15, bottom: 5, left: 40, right: 20),
@@ -234,7 +276,8 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   ),
                   Container(
                     margin: EdgeInsets.only(top: 15, bottom: 5, left: 20, right: 20),
-                    child: TextField(
+                    child: TextFormField(
+                      validator: _requiredValidator,
                       obscureText: false,
                       controller: instructionController,
                       style: TextStyle(
@@ -328,7 +371,41 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   Container(
                     padding: EdgeInsets.all(20),
                     child: FilledButton.tonal(
-                      onPressed: add,
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          final result = await add(); // Wait for the async function
+                          if (result == "Successfully added recipe") {
+                            nameController.clear();
+                            servingsController.clear();
+                            ingredientsController.clear();
+                            instructionController.clear();
+                            nutritionController.clear();
+                            unitController.clear();
+                            ingredientNameController.clear();
+                            quantityController.clear();
+                          }
+
+                          if(context.mounted){
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                content: Text(
+                                    result,
+                                    style: TextStyle(
+                                      fontSize: 25
+                                    )
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context), // Closes the dialog
+                                    child: Text("Close"),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        }
+                      },
                       style: ButtonStyle(
                         shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
@@ -342,6 +419,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                     ),
                   ),
                 ]
+              )
             )
         )
     );
