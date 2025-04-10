@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:food_manager/ItemProvider.dart';
+import 'package:food_manager/recipeProvider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.title});
@@ -105,6 +108,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                              setState(() {
                                loginButtonText = "Login Successful";
+                               Provider.of<ItemProvider>(context, listen: false).fetchItems();
+                               Provider.of<RecipeProvider>(context, listen: false).fetchRecipes();
                              });
 
                              await Future.delayed(Duration(seconds: 3));

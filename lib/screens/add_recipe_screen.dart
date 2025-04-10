@@ -235,7 +235,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                           // Unit TextField
                           Expanded(
                             child: TextFormField(
-                              validator: _ingredientRequiredValidator,
                               controller: unitController,
                               style: TextStyle(color: Colors.black, fontSize: 20),
                               decoration: InputDecoration(

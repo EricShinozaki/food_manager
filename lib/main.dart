@@ -46,8 +46,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<ItemProvider>(context, listen: false).fetchItems();
-    Provider.of<RecipeProvider>(context, listen: false).fetchRecipes();
     return MaterialApp.router(
       routerConfig: router,
       title: 'Flutter Demo',
