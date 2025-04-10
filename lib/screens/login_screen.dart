@@ -86,10 +86,13 @@ class _LoginScreenState extends State<LoginScreen> {
                  ),
                  Container(
                      margin: EdgeInsets.only(left: 180, right: 35),
-                     child: TextButton(
-                       onPressed: () => context.go('/login/forgotPassword'),
-                       child: const Text('Forgot Password?'),
-                     )
+                     child: Align(
+                         alignment: Alignment.topRight,
+                         child: TextButton(
+                           onPressed: () => context.go('/login/forgotPassword'),
+                           child: const Text('Forgot Password?'),
+                         ),
+                     ),
                  ),
                  Container(
                    margin: EdgeInsets.only(left: 35, right: 35),
