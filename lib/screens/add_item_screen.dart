@@ -142,7 +142,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("Added Nutrition Data:"),
-                  ...nutritionData.map((data) => Text(data)).toList(),
+                  ...nutritionData.map((data) => Text(data)),
                 ],
               ),
             ),
