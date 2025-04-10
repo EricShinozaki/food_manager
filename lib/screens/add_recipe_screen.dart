@@ -363,7 +363,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                                 ),
                               ),
                             );
-                          }).toList(),
+                          }),
                         ],
                       ),
                     ),

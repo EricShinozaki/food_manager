@@ -137,13 +137,57 @@ class _AddItemScreenState extends State<AddItemScreen> {
             ),
             Container(
               margin: EdgeInsets.only(top: 15, bottom: 5, left: 40, right: 20),
-              alignment: Alignment.centerLeft,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Added Nutrition Data:"),
-                  ...nutritionData.map((data) => Text(data)),
-                ],
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                          "Added Nutrition info:",
+                          style: TextStyle(
+                              fontSize: 20
+                          )
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    ...nutritionData.asMap().entries.map((entry) {
+                      int index = entry.key;
+                      String data = entry.value;
+
+                      return Container(
+                        margin: EdgeInsets.only(bottom: 8),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.white,
+                        ),
+                        child: ListTile(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          title: Text(
+                            data,
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 20
+                            ),
+                          ),
+                          trailing: IconButton(
+                            icon: Icon(Icons.delete, color: Colors.red),
+                            onPressed: () {
+                              setState(() {
+                                nutritionData.removeAt(index);
+                              });
+                              // Update UI depending on context
+                            },
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+                ),
               ),
             ),
             Container(
