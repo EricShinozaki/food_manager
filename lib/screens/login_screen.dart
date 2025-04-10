@@ -3,10 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-late final FirebaseAuth _auth;
-User? _user;
-String? _userId;
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.title});
 
@@ -111,11 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                loginButtonText = "Login Successful";
                              });
 
-                             _auth = FirebaseAuth.instance;
-                             _user = _auth.currentUser;
-                             _userId = _user?.uid;
-
-                             await Future.delayed(Duration(seconds: 2));
+                             await Future.delayed(Duration(seconds: 3));
 
                              if (!context.mounted) return;  // Prevents navigation if widget is unmounted
                              context.go('/');
@@ -215,8 +207,4 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-
-FirebaseAuth get auth => _auth;
-User? get user => _user;
-String? get userId => _userId;
 
