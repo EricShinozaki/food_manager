@@ -180,7 +180,6 @@ class _AddItemScreenState extends State<AddItemScreen> {
                               setState(() {
                                 nutritionData.removeAt(index);
                               });
-                              // Update UI depending on context
                             },
                           ),
                         ),

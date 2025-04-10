@@ -44,12 +44,13 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   void addIngredientToRecipe(){
     final ingredient = ingredientNameController.text;
     final unit = unitController.text;
-    double? quantity = parseQuantity();
+    double? quantity = _parseFraction(quantityController.text);
     double quantityAsDouble = quantity ?? 0.0;
+    quantityAsDouble = double.parse(quantityAsDouble.toStringAsFixed(2));
 
     if(ingredient.isNotEmpty){
       setState(() {
-        ingredientList.add(new Item(name: ingredient, quantity: quantityAsDouble, unit: unit, note: ''));
+        ingredientList.add(Item(name: ingredient, quantity: quantityAsDouble, unit: unit, note: ''));
       });
     }
 
@@ -101,13 +102,53 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   }
 
   String? _requiredDoubleValidator(String? value) {
-    double? servings = parseServings();
+    if (value == null || value.trim().isEmpty) {
+      return 'Number required';
+    }
 
-    if(servings == null){
-      return 'required';
+    final parsed = _parseFraction(value.trim());
+    if (parsed == null) {
+      return 'Invalid';
     }
 
     return null;
+  }
+
+  double? _parseFraction(String input) {
+    try {
+      if (input.contains(' ')) {
+        // Mixed number, e.g., "3 1/2"
+        final parts = input.split(' ');
+        if (parts.length != 2) return null;
+
+        final whole = double.parse(parts[0]);
+        final frac = _parseSimpleFraction(parts[1]);
+        if (frac == null) whole;
+
+        return whole + frac!;
+      } else if (input.contains('/')) {
+        // Simple fraction, e.g., "1/2"
+        return _parseSimpleFraction(input);
+      } else {
+        // Regular number
+        return double.parse(input);
+      }
+    } catch (_) {
+      return null;
+    }
+  }
+
+  double? _parseSimpleFraction(String input) {
+    final parts = input.split('/');
+    if (parts.length != 2) return null;
+
+    final numerator = double.tryParse(parts[0]);
+    final denominator = double.tryParse(parts[1]);
+    if (numerator == null || denominator == null || denominator == 0) {
+      return null;
+    }
+
+    return numerator / denominator;
   }
 
   @override
@@ -179,7 +220,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                           // Quantity TextField
                           Expanded(
                             child: TextFormField(
-                              validator: _ingredientRequiredValidator,
+                              validator: _requiredDoubleValidator,
                               controller: quantityController,
                               style: TextStyle(color: Colors.black, fontSize: 20),
                               decoration: InputDecoration(
@@ -383,6 +424,8 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                             unitController.clear();
                             ingredientNameController.clear();
                             quantityController.clear();
+                            nutritionData.clear();
+                            ingredientList.clear();
                           }
 
                           if(context.mounted){

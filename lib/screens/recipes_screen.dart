@@ -31,7 +31,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
                 subtitle: Text("Servings: ${recipe.servings}", style: TextStyle(fontSize: 15)),
                 onTap: () {
                   context.go('/recipes/recipeDetails/${recipe.name}');
-                }
+                },
             );
           }
       ),

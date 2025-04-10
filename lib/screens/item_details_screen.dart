@@ -13,7 +13,6 @@ class ItemDetailsScreen extends StatelessWidget {
     final Item = itemProvider.items.firstWhere((item) => item.name == title);
 
     return AlertDialog(
-      title: Text(title),
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min, // Allow the dialog to be as small as possible
