@@ -13,6 +13,8 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  var syncString = "Sync Data";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,40 +40,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: SizedBox(
                       width: double.infinity,
                       child: FilledButton.tonal(
-                        onPressed: (){
+                        onPressed: () async {
                           Provider.of<ItemProvider>(context, listen: false).fetchItems();
                           Provider.of<RecipeProvider>(context, listen: false).fetchRecipes();
-                          if(context.mounted){
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: Text(
-                                  "Synced",
-                                  style: TextStyle(
-                                    fontSize: 25,
-                                  ),
-                                ),
-                                content: Text(
-                                  "Recipe and inventory should now be up to date",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                  ),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    style: TextButton.styleFrom(
-                                      textStyle: Theme.of(context).textTheme.labelLarge,
-                                    ),
-                                    child: Text("Close"),
-                                  ),
-                                ],
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.zero, // No rounding on the edges
-                                ),
-                              ),
-                            );
-                          }
+                          setState(() {
+                            syncString = "Successfully synced";
+                          });
+                          await Future.delayed(Duration(seconds: 3));
+                          setState(() {
+                            syncString = "Sync Data";
+                          });
                         },
                         style: ButtonStyle(
                           backgroundColor: WidgetStateProperty.all(Colors.transparent),
@@ -83,7 +61,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ),
                         child: Text(
-                          "Sync Data",
+                          syncString,
                           style: TextStyle(
                             fontSize: 20,
                             color: Colors.black,
