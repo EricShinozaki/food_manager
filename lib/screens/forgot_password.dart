@@ -74,7 +74,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                         ),
-                        padding: MaterialStateProperty.all(
+                        padding: WidgetStateProperty.all(
                           EdgeInsets.symmetric(vertical: 18),
                         ),
                       ),
@@ -85,7 +85,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   )
                 )
-
               ],
             ),
           ),

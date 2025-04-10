@@ -102,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
                        child: FilledButton.tonal(
                          onPressed:() async {
                            try {
-                             final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+                             await FirebaseAuth.instance.signInWithEmailAndPassword(
                                  email: emailController.text,
                                  password: passwordController.text,
                              );
@@ -124,19 +124,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                setState(() {
                                  loginButtonText = "Incorrect email or password";
                                });
-                               await Future.delayed(Duration(seconds: 3));
-                               setState(() {
-                                 loginButtonText = "Login";
-                               });
                              } else {
                                setState(() {
                                  loginButtonText = "Invalid email or password";
                                });
-                               await Future.delayed(Duration(seconds: 3));
-                               setState(() {
-                                 loginButtonText = "Login";
-                               });
                              }
+
+                             await Future.delayed(Duration(seconds: 3));
+                             setState(() {
+                               loginButtonText = "Login";
+                             });
                            }
                          },
                          style: ButtonStyle(

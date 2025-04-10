@@ -16,6 +16,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   final emailController =  TextEditingController();
+  String createAccountText = "Create Account";
   String errorMessage = "";
 
   @override
@@ -122,26 +123,34 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               // Validate input fields
                               if (emailText.isEmpty || passwordText.isEmpty || confirmPasswordText.isEmpty) {
                                 setState(() {
-                                  errorMessage = "Please fill out all fields";
+                                  createAccountText = "Please fill out all fields";
+                                });
+                                await Future.delayed(Duration(seconds: 3));
+                                setState(() {
+                                  createAccountText = "Create Account";
                                 });
                                 return; // Stop execution
                               }
 
                               if (passwordText != confirmPasswordText) {
                                 setState(() {
-                                  errorMessage = "Passwords do not match";
+                                  createAccountText = "Passwords do not match";
+                                });
+                                await Future.delayed(Duration(seconds: 3));
+                                setState(() {
+                                  createAccountText = "Create Account";
                                 });
                                 return;
                               }
 
                               try {
-                                final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                                await FirebaseAuth.instance.createUserWithEmailAndPassword(
                                   email: emailText,
                                   password: passwordText,
                                 );
 
                                 setState(() {
-                                  errorMessage = "Successfully created account!";
+                                  createAccountText = "Created account! Returning to log in...";
                                 });
 
                                 // Delay before navigation
@@ -152,24 +161,31 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               } on FirebaseAuthException catch (e) {
                                 setState(() {
                                   if (e.code == 'weak-password') {
-                                    errorMessage = 'The password provided is too weak.';
+                                    createAccountText = 'The password provided is too weak.';
                                   } else if (e.code == 'email-already-in-use') {
-                                    errorMessage = 'The account already exists for that email.';
+                                    createAccountText = 'The account already exists for that email.';
+                                  } else if (e.code == 'invalid-email') {
+                                    createAccountText = 'The email address is badly formatted.';
+                                  } else if (e.code == 'network-request-failed') {
+                                    createAccountText = 'Network error, please try again later.';
+                                  } else if (e.code == 'too-many-requests') {
+                                    createAccountText = 'Too many requests. Please try again later.';
+                                  } else if (e.code == 'operation-not-allowed') {
+                                    createAccountText = 'Account creation is currently disabled.';
                                   } else {
-                                    errorMessage = "An unknown error occurred.";
+                                    createAccountText = 'An unknown error occurred.';
                                   }
+                                });
+
+                                await Future.delayed(Duration(seconds: 3));
+                                setState(() {
+                                  createAccountText = "Create Account";
                                 });
                               } catch (e) {
                                 setState(() {
-                                  errorMessage = e.toString();
+                                  createAccountText = e.toString();
                                 });
                               }
-
-                              await Future.delayed(Duration(seconds: 3));
-
-                              setState(() {
-                                errorMessage = "";
-                              });
                             },
                             style: ButtonStyle(
                               shape: WidgetStateProperty.all<RoundedRectangleBorder>(
@@ -180,14 +196,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               ),
                               backgroundColor: WidgetStateProperty.all(Colors.lightBlueAccent),
                             ),
-                            child: Text("Create Account")
+                            child: Text(createAccountText),
                         )
                     )
                 ),
-                Container(
-                  margin: EdgeInsets.only(left: 35, right: 35, bottom: 10, top: 15),
-                  child: Text(errorMessage),
-                )
               ],
             ),
           )
