@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:food_manager/main.dart';
 
 class Item {
@@ -11,22 +12,27 @@ class Item {
   String unit;
   String note;
   List<String> nutrition;
+  DateTime? expirationDate; // New field for expiration date
 
   Item({
     required this.name,
     required this.quantity,
     required this.unit,
-    required this.note, // Reminder, this can be left as empty string if no note
+    required this.note,
     this.nutrition = const [],
+    this.expirationDate, // Add expirationDate to constructor
   });
 
-  factory Item.fromFireStore(Map<String, dynamic> data){
+  factory Item.fromFireStore(Map<String, dynamic> data) {
     return Item(
       name: data['name'],
       quantity: data['quantity'].toDouble(),
       unit: data['unit'],
       note: data['note'],
-      nutrition: List<String>.from(['nutrition']),
+      nutrition: List<String>.from(data['nutrition']),
+      expirationDate: data['expirationDate'] != null
+          ? (data['expirationDate'] as Timestamp).toDate() // Convert Firestore Timestamp to DateTime
+          : null,
     );
   }
 
@@ -37,6 +43,7 @@ class Item {
       'unit': unit,
       'note': note,
       'nutrition': nutrition,
+      'expirationDate': expirationDate != null ? Timestamp.fromDate(expirationDate!) : null, // Convert DateTime to Firestore Timestamp
     };
   }
 }
@@ -64,6 +71,9 @@ class ItemProvider with ChangeNotifier {
           unit: doc['unit'],
           note: doc['note'],
           nutrition: List<String>.from(doc['nutrition']),
+          expirationDate: doc['expirationDate'] != null
+              ? (doc['expirationDate'] as Timestamp).toDate() // Convert Firestore Timestamp to DateTime
+              : null,
         );
       }).toList();
 
@@ -98,6 +108,9 @@ class ItemProvider with ChangeNotifier {
           'unit': item.unit,
           'note': item.note,
           'nutrition': item.nutrition,
+          'expirationDate': item.expirationDate != null
+              ? Timestamp.fromDate(item.expirationDate!) // Convert DateTime to Firestore Timestamp
+              : null,
         });
 
         _items.add(item);  // Add item locally
@@ -164,6 +177,9 @@ class ItemProvider with ChangeNotifier {
           'unit': item.unit,
           'note': item.note,
           'nutrition': item.nutrition,
+          'expirationDate': item.expirationDate != null
+              ? Timestamp.fromDate(item.expirationDate!) // Convert DateTime to Firestore Timestamp
+              : null,
         });
 
         // Update the local list as well
