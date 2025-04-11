@@ -38,7 +38,7 @@ final GoRouter _router =  GoRouter(
               GoRoute(
                   name: "recipes",
                   path: 'recipes',
-                  builder: (context, state) => RecipesScreen(title: "Recipes"),
+                  builder: (context, state) => RecipesScreen(),
                   routes: [
                     GoRoute(
                       name: "addRecipe",
@@ -80,7 +80,7 @@ final GoRouter _router =  GoRouter(
               GoRoute(
                   name: "inventory",
                   path: 'inventory',
-                  builder: (context, state) => InventoryScreen(title: "Inventory"),
+                  builder: (context, state) => InventoryScreen(),
                   routes: [
                     GoRoute(
                         name: "itemDetails",

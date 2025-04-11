@@ -9,6 +9,8 @@ class HomeNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     // Get the current route
     final String location = GoRouterState.of(context).uri.path;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       body: Stack(
@@ -16,8 +18,8 @@ class HomeNavigationBar extends StatelessWidget {
           child, // Your main body content here
           if (location != '/settings') // Only show button on non-settings pages
             Positioned(
-              top: 30.0, // Distance from the top edge of the screen
-              right: 0.0, // Distance from the right edge of the screen
+              top: screenHeight * 0.04, // 5% of screen height
+              right: screenWidth * 0.005, // 5% of screen width
               child: IconButton(
                 onPressed: () => context.push('/settings'),
                 icon: Icon(Icons.settings),

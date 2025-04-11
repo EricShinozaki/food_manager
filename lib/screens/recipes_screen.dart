@@ -4,9 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class RecipesScreen extends StatefulWidget {
-  const RecipesScreen({super.key, required this.title});
-
-  final String title;
+  const RecipesScreen({super.key});
 
   @override
   State<RecipesScreen> createState() => _RecipesScreenState();
@@ -20,7 +18,6 @@ class _RecipesScreenState extends State<RecipesScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
       ),
       body: ListView.builder(
           itemCount: recipeProvider.recipes.length,
