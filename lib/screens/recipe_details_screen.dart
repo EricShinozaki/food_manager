@@ -44,9 +44,6 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                             final ingredient = recipe.ingredients[index - 2]; // Adjust index to match ingredient list
                             return ListTile(
                               title: Text("${ingredient.quantity} ${ingredient.unit} ${ingredient.name}", style: TextStyle(fontSize: 20)),
-                              onTap: () {
-                                //context.go('/recipes/recipeDetails/${recipe.name}/ingredientDetails/${ingredient.name}');
-                              },
                             );
                           } else if(index == recipe.ingredients.length + 2){
                             return ListTile(
