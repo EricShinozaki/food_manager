@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:food_manager/ItemProvider.dart';
@@ -37,21 +38,27 @@ class _AddItemScreenState extends State<AddItemScreen> {
     }
   }
 
-  Future<void> add() async {
+  Future<String> add() async {
     final itemProvider = Provider.of<ItemProvider>(context, listen: false);
     double? quantity = parseQuantity();
     double quantityAsDouble = quantity ?? 0.0;
+    var date;
 
+    try {
+      date = DateFormat('MM/dd/yyyy').parse(dateController.text);
+    } catch(_) {
+      date = null;
+    }
     Item item = Item(
       name: nameController.text,
       quantity: quantityAsDouble,
       unit: unitController.text,
       note: noteController.text,
       nutrition: nutritionData,
-      expirationDate: DateFormat('MM/dd/yyyy').parse(dateController.text),
+      expirationDate: date,
     );
 
-    await itemProvider.addItem(item);
+    return await itemProvider.addItem(item);
   }
 
   double? parseQuantity() {
@@ -61,7 +68,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
   }
 
   String? _validateDate(String? value) {
-    if(value == null){
+    if(value == null || value.isEmpty){
       return null;
     }
 
@@ -71,6 +78,13 @@ class _AddItemScreenState extends State<AddItemScreen> {
       return "Invalid date";
     }
 
+    return null;
+  }
+
+  String? _requiredValidator(String? value) {
+    if(value == null || value.trim().isEmpty){
+      return 'This field is required';
+    }
     return null;
   }
 
@@ -89,7 +103,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
             children: [
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                child: TextField(
+                child: TextFormField(
+                  validator: _requiredValidator,
                   controller: nameController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
@@ -101,7 +116,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
               ),
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                child: TextField(
+                child: TextFormField(
+                  validator: _requiredValidator,
                   controller: quantityController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
@@ -227,9 +243,18 @@ class _AddItemScreenState extends State<AddItemScreen> {
               Container(
                 padding: EdgeInsets.all(20),
                 child: FilledButton.tonal(
-                  onPressed: () {
+                  onPressed: () async {
                     if(_formKey.currentState!.validate()){
-                      add();
+                      var addedMessage = await add();
+                      if(addedMessage == "Item added successfully"){
+                        nameController.clear();
+                        quantityController.clear();
+                        unitController.clear();
+                        noteController.clear();
+                        dateController.clear();
+                        nutritionController.clear();
+                        nutritionData.clear();
+                      }
                     }
                   },
                   style: ButtonStyle(

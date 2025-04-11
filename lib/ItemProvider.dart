@@ -86,7 +86,7 @@ class ItemProvider with ChangeNotifier {
   }
 
   // Add an item to Firestore for the logged-in user
-  Future<void> addItem(Item item) async {
+  Future<String> addItem(Item item) async {
     try {
       // Check if the item with the same name already exists
       final existingItemSnapshot = await database
@@ -115,15 +115,19 @@ class ItemProvider with ChangeNotifier {
 
         _items.add(item);  // Add item locally
         notifyListeners();
+        return "Item added successfully";
+
       } else {
         if (kDebugMode) {
           print("Item with this name already exists");
         }
+        return "Item with this name already exists";
       }
     } catch (error) {
       if (kDebugMode) {
         print("Failed to add item: $error");
       }
+      return "Failed to add item: $error";
     }
   }
 
