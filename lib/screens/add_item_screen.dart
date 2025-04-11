@@ -245,8 +245,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 child: FilledButton.tonal(
                   onPressed: () async {
                     if(_formKey.currentState!.validate()){
-                      var addedMessage = await add();
-                      if(addedMessage == "Item added successfully"){
+                      var result = await add();
+                      if(result == "Item added successfully"){
                         nameController.clear();
                         quantityController.clear();
                         unitController.clear();
@@ -254,6 +254,26 @@ class _AddItemScreenState extends State<AddItemScreen> {
                         dateController.clear();
                         nutritionController.clear();
                         nutritionData.clear();
+                      }
+
+                      if(context.mounted){
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            content: Text(
+                                result,
+                                style: TextStyle(
+                                    fontSize: 25
+                                )
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context), // Closes the dialog
+                                child: Text("Close"),
+                              ),
+                            ],
+                          ),
+                        );
                       }
                     }
                   },
