@@ -1,4 +1,3 @@
-import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:food_manager/ItemProvider.dart';
@@ -47,7 +46,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       routerConfig: router,
       title: 'Flutter Demo',
-      theme: AppTheme.getLightTheme(),
+      theme: AppTheme.getDarkTheme(),
       darkTheme: AppTheme.getDarkTheme(),
       themeMode: ThemeMode.system,
     );

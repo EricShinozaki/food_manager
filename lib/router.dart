@@ -15,6 +15,7 @@ import 'package:food_manager/screens/reset_password.dart';
 import 'package:food_manager/screens/scanning_screen.dart';
 import 'package:food_manager/screens/settings_screen.dart';
 import 'package:food_manager/screens/sign_up_screen.dart';
+import 'package:food_manager/screens/splash_screen.dart';
 import 'package:food_manager/screens/viewReceiptScreen.dart';
 import 'package:food_manager/widgets/homeNavigationBar.dart';
 import 'package:go_router/go_router.dart';
@@ -23,7 +24,7 @@ final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _homeNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter _router =  GoRouter(
-  initialLocation: '/login',
+  initialLocation: '/splash',
     navigatorKey: _rootNavigatorKey,
     routes: [
       ShellRoute(
@@ -151,6 +152,12 @@ final GoRouter _router =  GoRouter(
         path: '/settings',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => SettingsScreen(title: "Settings"),
+      ),
+      GoRoute(
+        name: "splashScreen",
+        path: "/splash",
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => SplashScreen(),
       )
     ]
 );
