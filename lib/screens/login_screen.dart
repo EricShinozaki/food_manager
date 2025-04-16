@@ -33,32 +33,11 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Column(
         children: [
           Expanded(
-            flex: 20,
-            child:
-            Image(
-                image: NetworkImage(
-                    'https://cdn.pixabay.com/photo/2024/02/23/08/27/apple-8591539_1280.jpg'
-                ),
-                fit: BoxFit.cover
-            ),
-          ),
-          Expanded(
             flex: 80,
             child: Column(
               children: [
                 Container(
-                  margin: EdgeInsets.only(top: 15, bottom: 15),
-                  child: Text(
-                    'Login',
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.formBackground,
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(left: 35, right: 35, bottom: 10, top: 10),
+                  margin: EdgeInsets.only(left: 35, right: 35, bottom: 10, top: 100),
                   child: TextField(
                     obscureText: false,
                     controller:  emailController,
@@ -125,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 Provider.of<RecipeProvider>(context, listen: false).fetchRecipes();
                               });
 
-                              await Future.delayed(Duration(seconds: 3));
+                              await Future.delayed(Duration(seconds: 2));
 
                               if (!context.mounted) return;  // Prevents navigation if widget is unmounted
                               context.go('/');
