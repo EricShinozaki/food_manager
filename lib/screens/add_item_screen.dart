@@ -1,13 +1,11 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:food_manager/ItemProvider.dart';
+import 'package:food_manager/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 class AddItemScreen extends StatefulWidget {
   const AddItemScreen({super.key, required this.title});
-
   final String title;
 
   @override
@@ -15,6 +13,7 @@ class AddItemScreen extends StatefulWidget {
 }
 
 class _AddItemScreenState extends State<AddItemScreen> {
+  final _formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   final quantityController = TextEditingController();
   final unitController = TextEditingController();
@@ -23,37 +22,45 @@ class _AddItemScreenState extends State<AddItemScreen> {
   final dateController = TextEditingController();
 
   List<String> nutritionData = [];
-  final _formKey = GlobalKey<FormState>();
-
 
   void addNutrition() {
-    final nutritionItem = nutritionController.text;
-
-    if (nutritionItem.isNotEmpty) {
+    final value = nutritionController.text.trim();
+    if (value.isNotEmpty) {
       setState(() {
-        nutritionData.add(nutritionItem);
+        nutritionData.add(value);
+        nutritionController.clear();
       });
+    }
+  }
 
-      nutritionController.clear();
+  Future<void> pickDate() async {
+    final selectedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+    );
+    if (selectedDate != null) {
+      dateController.text = DateFormat('MM/dd/yyyy').format(selectedDate);
     }
   }
 
   Future<String> add() async {
     final itemProvider = Provider.of<ItemProvider>(context, listen: false);
-    double? quantity = parseQuantity();
-    double quantityAsDouble = quantity ?? 0.0;
-    var date;
+    double? quantity = double.tryParse(quantityController.text.trim());
+    DateTime? date;
 
     try {
-      date = DateFormat('MM/dd/yyyy').parse(dateController.text);
-    } catch(_) {
+      date = DateFormat('MM/dd/yyyy').parse(dateController.text.trim());
+    } catch (_) {
       date = null;
     }
-    Item item = Item(
-      name: nameController.text,
-      quantity: quantityAsDouble,
-      unit: unitController.text,
-      note: noteController.text,
+
+    final item = Item(
+      name: nameController.text.trim(),
+      quantity: quantity ?? 0.0,
+      unit: unitController.text.trim(),
+      note: noteController.text.trim(),
       nutrition: nutritionData,
       expirationDate: date,
     );
@@ -61,170 +68,123 @@ class _AddItemScreenState extends State<AddItemScreen> {
     return await itemProvider.addItem(item);
   }
 
-  double? parseQuantity() {
-    final quantityText = quantityController.text;
-    final value = double.tryParse(quantityText);
-    return value;
-  }
-
-  String? _validateDate(String? value) {
-    if(value == null || value.isEmpty){
-      return null;
-    }
-
-    try {
-      DateFormat('MM/dd/yyyy').parse(value!);
-    } catch(_){
-      return "Invalid date";
-    }
-
-    return null;
-  }
-
   String? _requiredValidator(String? value) {
-    if(value == null || value.trim().isEmpty){
+    if (value == null || value.trim().isEmpty) {
       return 'This field is required';
     }
     return null;
+  }
+
+  String? _validateDate(String? value) {
+    if (value == null || value.trim().isEmpty) return null;
+    try {
+      DateFormat('MM/dd/yyyy').parse(value);
+    } catch (_) {
+      return 'Invalid date format';
+    }
+    return null;
+  }
+
+  Widget buildTextField({
+    required TextEditingController controller,
+    required String label,
+    String? Function(String?)? validator,
+    TextInputType? keyboardType,
+    VoidCallback? onTap,
+    bool readOnly = false,
+    Widget? suffixIcon,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      child: TextFormField(
+        controller: controller,
+        validator: validator,
+        keyboardType: keyboardType,
+        readOnly: readOnly,
+        onTap: onTap,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+          suffixIcon: suffixIcon,
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
-      resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              const SizedBox(height: 10),
+              buildTextField(
+                controller: nameController,
+                label: 'Item Name',
+                validator: _requiredValidator,
+              ),
+              buildTextField(
+                controller: quantityController,
+                label: 'Quantity',
+                validator: _requiredValidator,
+                keyboardType: TextInputType.number,
+              ),
+              buildTextField(
+                controller: unitController,
+                label: 'Unit (e.g., kg, L, pieces)',
+              ),
+              buildTextField(
+                controller: noteController,
+                label: 'Notes (optional)',
+              ),
+              buildTextField(
+                controller: dateController,
+                label: 'Expiration Date (MM/DD/YYYY)',
+                validator: _validateDate,
+                onTap: pickDate,
+                readOnly: true,
+                suffixIcon: Icon(Icons.calendar_today),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                 child: TextFormField(
-                  validator: _requiredValidator,
-                  controller: nameController,
+                  controller: nutritionController,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
+                    labelText: 'Add Nutrition Info',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.add),
+                      onPressed: addNutrition,
                     ),
-                    labelText: 'Item Name',
                   ),
                 ),
               ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                child: TextFormField(
-                  validator: _requiredValidator,
-                  controller: quantityController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    labelText: 'Item Quantity',
-                  ),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                child: TextField(
-                  controller: unitController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    labelText: 'Item Unit Placeholder',
-                  ),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                child: TextField(
-                  controller: noteController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    labelText: 'Notes',
-                  ),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                child: TextFormField(
-                  validator: _validateDate,
-                  controller: dateController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    labelText: 'Expiration Date (MM/DD/YYYY)',
-                  ),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: nutritionController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          labelText: 'Nutrition',
-                          suffixIcon: IconButton(
-                            icon: Icon(Icons.add),
-                            onPressed: addNutrition,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(top: 15, bottom: 5, left: 40, right: 20),
-                child: Align(
-                  alignment: Alignment.centerLeft,
+              if (nutritionData.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                            "Added Nutrition info:",
-                            style: TextStyle(
-                                fontSize: 20
-                            )
-                        ),
+                      Text(
+                        'Nutrition Info:',
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 8),
                       ...nutritionData.asMap().entries.map((entry) {
                         int index = entry.key;
-                        String data = entry.value;
-
-                        return Container(
-                          margin: EdgeInsets.only(bottom: 8),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            borderRadius: BorderRadius.circular(20),
-                            color: Colors.white,
+                        String value = entry.value;
+                        return Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
                           ),
                           child: ListTile(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            title: Text(
-                              data,
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20
-                              ),
-                            ),
+                            title: Text(value),
                             trailing: IconButton(
                               icon: Icon(Icons.delete, color: Colors.red),
                               onPressed: () {
@@ -239,61 +199,53 @@ class _AddItemScreenState extends State<AddItemScreen> {
                     ],
                   ),
                 ),
-              ),
-              Container(
-                padding: EdgeInsets.all(20),
-                child: FilledButton.tonal(
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                child: FilledButton(
                   onPressed: () async {
-                    if(_formKey.currentState!.validate()){
-                      var result = await add();
-                      if(result == "Item added successfully"){
+                    if (_formKey.currentState!.validate()) {
+                      String result = await add();
+                      if (!context.mounted) return;
+
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          content: Text(result, style: const TextStyle(fontSize: 18)),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Close'),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (result == "Item added successfully") {
                         nameController.clear();
                         quantityController.clear();
                         unitController.clear();
                         noteController.clear();
                         dateController.clear();
                         nutritionController.clear();
-                        nutritionData.clear();
-                      }
-
-                      if(context.mounted){
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            content: Text(
-                                result,
-                                style: TextStyle(
-                                    fontSize: 25
-                                )
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context), // Closes the dialog
-                                child: Text("Close"),
-                              ),
-                            ],
-                          ),
-                        );
+                        setState(() => nutritionData.clear());
                       }
                     }
                   },
-                  style: ButtonStyle(
-                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                        side: BorderSide(color: Colors.black),
-                      ),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.buttonBackground,
+                    foregroundColor: AppColors.buttonText,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    backgroundColor: WidgetStateProperty.all(Colors.white),
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                   ),
-                  child: Text("Add item"),
+                  child: const Text("Add Item"),
                 ),
               ),
             ],
           ),
-        )
+        ),
       ),
     );
   }
 }
-

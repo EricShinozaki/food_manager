@@ -4,12 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:food_manager/ItemProvider.dart';
 import 'package:food_manager/recipeProvider.dart';
 import 'package:food_manager/router.dart';
-import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'package:flutter/services.dart';
+import 'theme/app_theme.dart';
 
 late FirebaseFirestore _firestore;
 
@@ -36,7 +35,6 @@ Future<void> main() async {
       child: MyApp(),
     ),
   );
-
 }
 
 FirebaseFirestore get db => _firestore;
@@ -49,8 +47,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       routerConfig: router,
       title: 'Flutter Demo',
-      theme: FlexThemeData.light(scheme: FlexScheme.bahamaBlue),
-      darkTheme: FlexThemeData.dark(scheme: FlexScheme.bahamaBlue),
+      theme: AppTheme.getLightTheme(),
+      darkTheme: AppTheme.getDarkTheme(),
       themeMode: ThemeMode.system,
     );
   }

@@ -49,7 +49,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         title: Container(
           margin: const EdgeInsets.only(right: 30),
           height: 40,
