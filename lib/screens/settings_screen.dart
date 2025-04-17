@@ -273,6 +273,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onConfirm: _logout,
                 );
               }),
+              _buildSettingsButton("Change Password", () {
+                _showChangePasswordDialog(context);
+              }),
               _buildSettingsButton("Delete Account", () {
                 _showConfirmationDialog(
                   context: scaffoldContext,
@@ -281,9 +284,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   confirmText: "Delete",
                   onConfirm: _deleteAccount,
                 );
-              }),
-              _buildSettingsButton("Change Password", () {
-                _showChangePasswordDialog(context);
               }),
             ]),
             _buildSection("Appearance", [

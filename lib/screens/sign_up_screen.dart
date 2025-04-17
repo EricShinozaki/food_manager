@@ -30,21 +30,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
       body: Column(
         children: [
           Expanded(
-            flex: 20,
-            child:
-            Image(
-                image: NetworkImage(
-                    'https://cdn.pixabay.com/photo/2024/02/23/08/27/apple-8591539_1280.jpg'
-                ),
-                fit: BoxFit.cover
-            ),
-          ),
-          Expanded(
             flex: 80,
             child: Column(
               children: [
                 Container(
-                  margin: EdgeInsets.only(top: 15, bottom: 15),
+                  margin: EdgeInsets.only(top: 50, bottom: 15),
                   child: Text(
                     'Create an account',
                     style: TextStyle(

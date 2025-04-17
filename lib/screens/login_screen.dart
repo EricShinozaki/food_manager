@@ -51,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               children: [
                 Container(
-                  margin: EdgeInsets.only(left: 35, right: 35, bottom: 10, top: 100),
+                  margin: EdgeInsets.only(left: 35, right: 35, bottom: 10, top: 50),
                   child: TextField(
                     obscureText: false,
                     controller:  emailController,
