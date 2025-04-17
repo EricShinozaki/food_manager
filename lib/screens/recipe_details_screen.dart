@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:food_manager/item_provider.dart';
 import 'package:food_manager/recipe_provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -184,6 +185,38 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
               ),
             )),
           ],
+
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.orange.shade600, Colors.red.shade400],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              child: FilledButton.tonal(
+                onPressed: () {
+                  recipeProvider.removeRecipe(recipe.name);
+                  context.go('/recipes');
+                },
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                  shadowColor: WidgetStateProperty.all(Colors.transparent),
+                  shape: WidgetStateProperty.all(
+                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  ),
+                ),
+                child: Text(
+                  "Delete recipe",
+                  style: const TextStyle(fontSize: 18, color: Colors.black),
+                ),
+              ),
+            ),
+          )
         ],
       ),
     );

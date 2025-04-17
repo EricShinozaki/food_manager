@@ -15,28 +15,37 @@ class _RecipesScreenState extends State<RecipesScreen> {
   List<Recipe> _filteredRecipesList = [];
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Initialize the filtered list only once when the screen is loaded
-    final recipeProvider = Provider.of<RecipeProvider>(context, listen: false);
-    setState(() {
-      _filteredRecipesList = List.from(recipeProvider.recipes);
-    });
+  void initState() {
+    super.initState();
+    _searchKey.addListener(_onSearchChanged);
   }
 
-  void _filtersRecipeBySearchTerm(String searchText) {
-    // Only filter the list when necessary and directly modify the filtered list
-    final recipeProvider = Provider.of<RecipeProvider>(context, listen: false);
+  @override
+  void dispose() {
+    _searchKey.removeListener(_onSearchChanged);
+    _searchKey.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    final searchText = _searchKey.text.toLowerCase();
+    final allItems = context.read<RecipeProvider>().recipes;
     setState(() {
-      _filteredRecipesList = recipeProvider.recipes
-          .where((recipe) =>
-          recipe.name.toLowerCase().contains(searchText.toLowerCase()))
+      _filteredRecipesList = allItems
+          .where((item) => item.name.toLowerCase().contains(searchText))
           .toList();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final recipeProvider =  Provider.of<RecipeProvider>(context);
+    final allRecipes = recipeProvider.recipes;
+
+    if(_searchKey.text.isEmpty) {
+      _filteredRecipesList = List.from(allRecipes);
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -49,28 +58,18 @@ class _RecipesScreenState extends State<RecipesScreen> {
           child: TextField(
             controller: _searchKey,
             decoration: InputDecoration(
-              prefixIcon: IconButton(
-                icon: Icon(
-                  Icons.search_rounded,
-                  color: Theme.of(context).primaryColorDark,
-                ),
-                onPressed: () => FocusScope.of(context).unfocus(),
-              ),
+              prefixIcon: Icon(Icons.search, color: Theme.of(context).primaryColorDark),
               suffixIcon: IconButton(
-                icon: Icon(
-                  Icons.clear_rounded,
-                  color: Theme.of(context).primaryColorDark,
-                ),
+                icon: Icon(Icons.clear, color: Theme.of(context).primaryColorDark),
                 onPressed: () {
                   _searchKey.clear();
-                  _filtersRecipeBySearchTerm("");  // Clear the search
+                  FocusScope.of(context).unfocus();
                 },
               ),
               hintText: 'Search...',
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(vertical: 10),
+              contentPadding: const EdgeInsets.symmetric(vertical: 10),
             ),
-            onChanged: _filtersRecipeBySearchTerm,
           ),
         ),
         iconTheme: IconThemeData(color: Theme.of(context).primaryColorDark),
@@ -79,23 +78,17 @@ class _RecipesScreenState extends State<RecipesScreen> {
       body: GestureDetector(
         onTap: () {
           // Prevent the screen from unfocusing when tapping outside
-          FocusScope.of(context).requestFocus(FocusNode());
+          FocusScope.of(context).unfocus;
         },
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Consumer<RecipeProvider>(
-            builder: (context, recipeProvider, child) {
-              // When no recipes match, show a message
-              if (_filteredRecipesList.isEmpty) {
-                return const Center(child: Text('No recipes found.'));
-              }
-              return ListView.builder(
-                itemCount: _filteredRecipesList.length,
-                itemBuilder: (context, index) {
-                  final recipe = _filteredRecipesList[index];
-                  return _buildRecipeCard(context, recipe);
-                },
-              );
+          child: _filteredRecipesList.isEmpty
+              ? const Center(child: Text('No items found.'))
+              : ListView.builder(
+            itemCount: _filteredRecipesList.length,
+            itemBuilder: (context, index) {
+              final item = _filteredRecipesList[index];
+              return _buildRecipeCard(context, item);
             },
           ),
         ),

@@ -222,7 +222,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                       ),
                     );
 
-
                     if (result == "Recipe added successfully") {
                       nameController.clear();
                       quantityController.clear();
