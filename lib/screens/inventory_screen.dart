@@ -243,7 +243,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
           content: TextField(
             controller: controller,
             keyboardType: TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(labelText: 'Enter quantity to use'),
+            decoration: const InputDecoration(labelText: 'Enter quantity to add'),
           ),
           actions: [
             TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),

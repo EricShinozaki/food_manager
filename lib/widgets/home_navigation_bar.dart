@@ -25,7 +25,7 @@ class HomeNavigationBar extends StatelessWidget {
           NavigationDestination(icon: Icon(Icons.flatware), label: 'Recipes'),
           NavigationDestination(icon: Icon(Icons.inventory_2), label: 'Inventory'),
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.crop_free), label: 'Scan'),
+          //NavigationDestination(icon: Icon(Icons.crop_free), label: 'Scan'),
           NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
         ],
       )
@@ -39,10 +39,10 @@ class HomeNavigationBar extends StatelessWidget {
       return 0;  // Recipes tab
     } else if (location.startsWith('/inventory')) {
       return 1;  // Inventory tab
-    } else if (location.startsWith('/scanning')) {
-      return 3;  // Scan tab
+    //} else if (location.startsWith('/scanning')) {
+      //return 3;  // Scan tab
     } else if (location.startsWith('/settings')) {
-      return 4;  // settings tab
+      return 3;  // settings tab
     }
 
     // Default to Home tab if no match
@@ -50,6 +50,6 @@ class HomeNavigationBar extends StatelessWidget {
   }
 
   String _getPath(int index) {
-    return ['/recipes', '/inventory', '/', '/scanning', '/settings'][index];
+    return ['/recipes', '/inventory', '/', '/settings'][index];
   }
 }
