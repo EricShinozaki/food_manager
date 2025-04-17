@@ -13,8 +13,6 @@ class InventoryScreen extends StatefulWidget {
 
 class _InventoryScreenState extends State<InventoryScreen> {
   final TextEditingController _searchKey = TextEditingController();
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
   List<Item> _filteredItemsList = [];
 
   @override
@@ -33,7 +31,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
   void _onSearchChanged() {
     final searchText = _searchKey.text.toLowerCase();
     final allItems = context.read<ItemProvider>().items;
-
     setState(() {
       _filteredItemsList = allItems
           .where((item) => item.name.toLowerCase().contains(searchText))
@@ -46,13 +43,12 @@ class _InventoryScreenState extends State<InventoryScreen> {
     final itemProvider = Provider.of<ItemProvider>(context);
     final allItems = itemProvider.items;
 
-    // Update list if search is empty or initial load
-    if (_searchKey.text.isEmpty && _filteredItemsList.length != allItems.length) {
+    // Update filtered list when search text changes or items change
+    if (_searchKey.text.isEmpty) {
       _filteredItemsList = List.from(allItems);
     }
 
     return Scaffold(
-      key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Container(
@@ -65,9 +61,9 @@ class _InventoryScreenState extends State<InventoryScreen> {
           child: TextField(
             controller: _searchKey,
             decoration: InputDecoration(
-              prefixIcon: Icon(Icons.search_rounded, color: Theme.of(context).primaryColorDark),
+              prefixIcon: Icon(Icons.search, color: Theme.of(context).primaryColorDark),
               suffixIcon: IconButton(
-                icon: Icon(Icons.clear_rounded, color: Theme.of(context).primaryColorDark),
+                icon: Icon(Icons.clear, color: Theme.of(context).primaryColorDark),
                 onPressed: () {
                   _searchKey.clear();
                   FocusScope.of(context).unfocus();
@@ -105,6 +101,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
   }
 
+
   Widget _buildItemCard(BuildContext context, Item item) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -112,68 +109,81 @@ class _InventoryScreenState extends State<InventoryScreen> {
       margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        title: Text(
-          item.name,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Quantity: ${item.quantity} ${item.unit}", style: const TextStyle(fontSize: 15)),
-          ],
-        ),
+        title: Text(item.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+        subtitle: Text("Quantity: ${item.quantity} ${item.unit}"),
         trailing: item.expirationDate != null
             ? Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-                "Expires",
-                style: const TextStyle(fontSize: 14),
-            ),
-            Text(
-              DateFormat('MM/dd/yyyy').format(item.expirationDate!),
-              style: const TextStyle(fontSize: 14),
-            ),
+            const Text("Expires", style: TextStyle(fontSize: 14)),
+            Text(DateFormat('MM/dd/yyyy').format(item.expirationDate!), style: const TextStyle(fontSize: 14)),
           ],
         )
-            : Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Expires",
-              style: const TextStyle(fontSize: 14),
-            ),
-            Text(
-              "N/A",
-              style: const TextStyle(fontSize: 14),
-            ),
-          ],
-        ),
-        onTap: () => _showItemDetailsBottomSheet(context, item),
+            : const Text("Expires\nN/A", textAlign: TextAlign.center, style: TextStyle(fontSize: 14)),
+        onTap: () => _showItemActionsBottomSheet(context, item),
       ),
     );
   }
 
-  void _showItemDetailsBottomSheet(BuildContext context, Item item) {
+  void _showItemActionsBottomSheet(BuildContext context, Item item) {
+    final itemProvider = Provider.of<ItemProvider>(context, listen: false);
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      isDismissible: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (context) {
-        return Container(
+        return ConstrainedBox(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.35,
+            maxHeight: MediaQuery.of(context).size.height * 0.4,
           ),
-          width: double.infinity,
-          padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildItemDetailsHeader(context, item),
-                const SizedBox(height: 10),
-                _buildItemDetails(item),
-              ],
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: SingleChildScrollView(
+              child: Wrap(
+                children: [
+                  ListTile(
+                    title: Text(item.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 8),
+                        Text("Quantity: ${item.quantity} ${item.unit}"),
+                        if (item.note.isNotEmpty) Text("Note: ${item.note}"),
+                        if (item.expirationDate != null)
+                          Text("Expires on: ${DateFormat('MM/dd/yyyy').format(item.expirationDate!)}"),
+                      ],
+                    ),
+                  ),
+                  const Divider(),
+                  ListTile(
+                    leading: const Icon(Icons.edit),
+                    title: const Text('Edit'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.go('/inventory/editItem/${item.name}');
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.remove_circle_outline),
+                    title: const Text('Use item'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showUseQuantityDialog(context, item, itemProvider);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.delete),
+                    title: const Text('Delete'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showDeleteConfirmation(context, item, itemProvider);
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -181,40 +191,66 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
   }
 
-  Widget _buildItemDetailsHeader(BuildContext context, Item item) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            item.name,
-            style: const TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
+
+  void _showUseQuantityDialog(BuildContext context, Item item, ItemProvider provider) {
+    final TextEditingController controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Use ${item.name}"),
+          content: TextField(
+            controller: controller,
+            keyboardType: TextInputType.numberWithOptions(decimal: true),
+            decoration: const InputDecoration(labelText: 'Enter quantity to use'),
           ),
-        ),
-        Align(
-          alignment: Alignment.topRight,
-          child: IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(Icons.expand_circle_down_sharp),
-          ),
-        ),
-      ],
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () {
+                final amount = double.tryParse(controller.text);
+                if (amount != null && amount > 0) {
+                  final newQty = (item.quantity - amount).clamp(0, double.infinity);
+                  final updatedItem = Item(
+                    name: item.name,
+                    quantity: newQty.toDouble(),
+                    unit: item.unit,
+                    note: item.note,
+                    expirationDate: item.expirationDate,
+                    nutrition: item.nutrition,
+                  );
+                  provider.updateItem(updatedItem);
+                }
+                Navigator.pop(context);
+              },
+              child: const Text('Use'),
+            ),
+          ],
+        );
+      },
     );
   }
 
-  Widget _buildItemDetails(Item item) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("Quantity: ${item.quantity} ${item.unit}", style: const TextStyle(fontSize: 16)),
-        const SizedBox(height: 10),
-        Text("Notes: ${item.note}", style: const TextStyle(fontSize: 16)),
-        const SizedBox(height: 10),
-        Text("Nutrition: ${getNutritionString(item)}", style: const TextStyle(fontSize: 16)),
-      ],
+  void _showDeleteConfirmation(BuildContext context, Item item, ItemProvider provider) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Delete Item"),
+          content: Text("Are you sure you want to delete '${item.name}'?"),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () {
+                provider.removeItem(item.name);
+                Navigator.pop(context);
+              },
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
     );
-  }
-
-  String getNutritionString(Item item) {
-    return item.nutrition.isEmpty ? "N/A" : item.nutrition.join(", ");
   }
 }

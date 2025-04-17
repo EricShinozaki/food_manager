@@ -100,6 +100,7 @@ class ItemProvider with ChangeNotifier {
     }
 
     try {
+      // Check if the item already exists
       final existingItemSnapshot = await database
           .collection('users')
           .doc(user?.uid)
@@ -108,14 +109,17 @@ class ItemProvider with ChangeNotifier {
           .get();
 
       if (existingItemSnapshot.docs.isEmpty) {
+        // Add the item to Firestore
         await database
             .collection('users')
             .doc(user?.uid)
             .collection('items')
             .add(item.toMap());
 
+        // Add the item locally
         _items.add(item);
         notifyListeners();
+
         return "Item added successfully";
       } else {
         if (kDebugMode) {
@@ -131,12 +135,14 @@ class ItemProvider with ChangeNotifier {
     }
   }
 
+
   Future<void> removeItem(String name) async {
     if (user == null) {
       return;
     }
 
     try {
+      // Find the item in Firestore
       final itemSnapshot = await database
           .collection('users')
           .doc(user?.uid)
@@ -145,6 +151,7 @@ class ItemProvider with ChangeNotifier {
           .get();
 
       if (itemSnapshot.docs.isNotEmpty) {
+        // Delete the item from Firestore
         await database
             .collection('users')
             .doc(user?.uid)
@@ -152,6 +159,7 @@ class ItemProvider with ChangeNotifier {
             .doc(itemSnapshot.docs.first.id)
             .delete();
 
+        // Remove the item from the local list
         _items.removeWhere((item) => item.name == name);
         notifyListeners();
       }
@@ -176,6 +184,7 @@ class ItemProvider with ChangeNotifier {
           .get();
 
       if (itemSnapshot.docs.isNotEmpty) {
+        // Update the item in Firestore
         await database
             .collection('users')
             .doc(user?.uid)
@@ -183,6 +192,7 @@ class ItemProvider with ChangeNotifier {
             .doc(itemSnapshot.docs.first.id)
             .update(item.toMap());
 
+        // Update the item in the local list
         int index = _items.indexWhere((i) => i.name == item.name);
         if (index != -1) {
           _items[index] = item;
