@@ -11,6 +11,11 @@ class HomeNavigationBar extends StatelessWidget {
     final String location = GoRouterState.of(context).uri.path;
 
     return Scaffold(
+      body: Stack(
+        children: [
+          child, // Your main body content here
+        ],
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _getIndex(location), // Determine selected tab
         onDestinationSelected: (index) {
@@ -25,6 +30,7 @@ class HomeNavigationBar extends StatelessWidget {
         ],
       )
     );
+
   }
 
   int _getIndex(String location) {
