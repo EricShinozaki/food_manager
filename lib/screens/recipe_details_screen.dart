@@ -1,4 +1,7 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
+import 'package:food_manager/item_provider.dart';
 import 'package:food_manager/recipe_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -22,8 +25,15 @@ _launchURLBrowser(String? url) async {
 class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
   @override
   Widget build(BuildContext context) {
+    final itemProvider = Provider.of<ItemProvider>(context);
+    final items = itemProvider.items;
     final recipeProvider = Provider.of<RecipeProvider>(context);
     final recipe = recipeProvider.recipes.firstWhere((recipe) => recipe.name == widget.title);
+    HashSet<String> usersItems = HashSet<String>();
+
+    for(Item i in items){
+      usersItems.add(i.name.toLowerCase());
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -84,9 +94,33 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
           // Ingredients list
           ...recipe.ingredients.map((ingredient) => ListTile(
             title: Center(
-              child: Text(
-                "${ingredient.quantity} ${ingredient.unit} ${ingredient.name}",
-                style: const TextStyle(fontSize: 20),
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 4,
+                children: [
+                  // Group the icon + quantity/unit together
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        usersItems.contains(ingredient.name.toLowerCase())
+                            ? Icons.check
+                            : Icons.close,
+                        size: 24,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        "${ingredient.quantity} ${ingredient.unit}",
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    ingredient.name,
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                ],
               ),
             ),
           )),
