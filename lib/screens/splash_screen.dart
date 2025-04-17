@@ -1,8 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:food_manager/ItemProvider.dart';
-import 'package:food_manager/recipeProvider.dart';
+import 'package:food_manager/item_provider.dart';
+import 'package:food_manager/recipe_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -15,15 +14,19 @@ class SplashScreen extends StatelessWidget {
       future: Future.delayed(const Duration(seconds: 1)), // Simulate loading
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          // Delay the navigation by a microtask so it doesn't trigger during build
-          Future.microtask(() {
+          Future.microtask(() async {
             final user = FirebaseAuth.instance.currentUser;
-            if (user != null) {
-              Provider.of<ItemProvider>(context, listen: false).fetchItems();
-              Provider.of<RecipeProvider>(context, listen: false).fetchRecipes();
-              context.go('/'); // assuming '/' is home
-            } else {
+
+            if (!context.mounted) {
               context.go('/login');
+            } else {
+              if (user != null) {
+                await Provider.of<ItemProvider>(context, listen: false).fetchItems();
+                await Provider.of<RecipeProvider>(context, listen: false).fetchRecipes();
+                context.go('/');
+              } else {
+                context.go('/login');
+              }
             }
           });
         }

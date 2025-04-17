@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:food_manager/recipeProvider.dart';
+import 'package:food_manager/recipe_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -12,34 +12,25 @@ class RecipesScreen extends StatefulWidget {
 
 class _RecipesScreenState extends State<RecipesScreen> {
   final TextEditingController _searchKey = TextEditingController();
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  List<Recipe> _allRecipesList = [];
   List<Recipe> _filteredRecipesList = [];
-
-  @override
-  void initState() {
-    super.initState();
-    final recipeProvider = Provider.of<RecipeProvider>(context, listen: false);
-    _allRecipesList = recipeProvider.recipes;
-    _filteredRecipesList = recipeProvider.recipes;
-  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final itemProvider = Provider.of<RecipeProvider>(context, listen: false);
+    // Initialize the filtered list only once when the screen is loaded
+    final recipeProvider = Provider.of<RecipeProvider>(context, listen: false);
     setState(() {
-      _allRecipesList = List.from(itemProvider.recipes);
-      _filteredRecipesList = List.from(itemProvider.recipes);
+      _filteredRecipesList = List.from(recipeProvider.recipes);
     });
   }
 
-  void _filtersRecipeBySearchTerm(String searchText){
+  void _filtersRecipeBySearchTerm(String searchText) {
+    // Only filter the list when necessary and directly modify the filtered list
+    final recipeProvider = Provider.of<RecipeProvider>(context, listen: false);
     setState(() {
-      _filteredRecipesList = _allRecipesList
-          .where((item) =>
-          item.name.toLowerCase().contains(searchText.toLowerCase()))
+      _filteredRecipesList = recipeProvider.recipes
+          .where((recipe) =>
+          recipe.name.toLowerCase().contains(searchText.toLowerCase()))
           .toList();
     });
   }
@@ -47,7 +38,6 @@ class _RecipesScreenState extends State<RecipesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Container(
@@ -67,25 +57,24 @@ class _RecipesScreenState extends State<RecipesScreen> {
                 onPressed: () => FocusScope.of(context).unfocus(),
               ),
               suffixIcon: IconButton(
-                  icon: Icon(
-                    Icons.clear_rounded,
-                    color: Theme.of(context).primaryColorDark,
-                  ),
-                  onPressed: () {
-                    _searchKey.text = "";
-                    _filtersRecipeBySearchTerm("");
-                  }),
+                icon: Icon(
+                  Icons.clear_rounded,
+                  color: Theme.of(context).primaryColorDark,
+                ),
+                onPressed: () {
+                  _searchKey.clear();
+                  _filtersRecipeBySearchTerm("");  // Clear the search
+                },
+              ),
               hintText: 'Search...',
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(vertical: 10),
             ),
-            onChanged: (value) => _filtersRecipeBySearchTerm(value),
-            onSubmitted: (value) => _filtersRecipeBySearchTerm(value),
+            onChanged: _filtersRecipeBySearchTerm,
           ),
         ),
-        iconTheme: IconThemeData(
-          color: Theme.of(context).primaryColorDark,
-        ), elevation: 0,
+        iconTheme: IconThemeData(color: Theme.of(context).primaryColorDark),
+        elevation: 0,
       ),
       body: GestureDetector(
         onTap: () {
@@ -94,23 +83,18 @@ class _RecipesScreenState extends State<RecipesScreen> {
         },
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: ListView.builder(
-            itemCount: _filteredRecipesList.length,
-            itemBuilder: (context, index) {
-              final recipe = _filteredRecipesList[index];
-
-              return Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                elevation: 2,
-                margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  title: Text(recipe.name, style: TextStyle(fontSize: 20)),
-                  subtitle: Text("Servings: ${recipe.servings}", style: TextStyle(fontSize: 15)),
-                  onTap: () {
-                    context.go('/recipes/recipeDetails/${recipe.name}');
-                  },
-                ),
+          child: Consumer<RecipeProvider>(
+            builder: (context, recipeProvider, child) {
+              // When no recipes match, show a message
+              if (_filteredRecipesList.isEmpty) {
+                return const Center(child: Text('No recipes found.'));
+              }
+              return ListView.builder(
+                itemCount: _filteredRecipesList.length,
+                itemBuilder: (context, index) {
+                  final recipe = _filteredRecipesList[index];
+                  return _buildRecipeCard(context, recipe);
+                },
               );
             },
           ),
@@ -120,7 +104,23 @@ class _RecipesScreenState extends State<RecipesScreen> {
         onPressed: () => context.go('/recipes/addRecipe'),
         tooltip: 'Add a recipe',
         child: const Icon(Icons.add),
-      ), //
+      ),
+    );
+  }
+
+  Widget _buildRecipeCard(BuildContext context, Recipe recipe) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        title: Text(recipe.name, style: const TextStyle(fontSize: 20)),
+        subtitle: Text("Servings: ${recipe.servings}", style: const TextStyle(fontSize: 15)),
+        onTap: () {
+          context.go('/recipes/recipeDetails/${recipe.name}');
+        },
+      ),
     );
   }
 }

@@ -1,16 +1,16 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:food_manager/ItemProvider.dart';
-import 'package:food_manager/recipeProvider.dart';
+import 'package:food_manager/item_provider.dart';
+import 'package:food_manager/recipe_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:food_manager/theme/app_theme.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key, required this.title});
+  const LoginScreen({super.key, required this.title, required this.email});
 
   final String title;
+  final String email;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -20,6 +20,20 @@ class _LoginScreenState extends State<LoginScreen> {
   final passwordController = TextEditingController();
   final emailController =  TextEditingController();
   String loginButtonText = "Login";
+
+  @override
+  void initState() {
+    super.initState();
+    emailController.text = widget.email;
+  }
+
+  @override
+  void didUpdateWidget(covariant LoginScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if(widget.email != oldWidget.email){
+      emailController.text = widget.email;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,41 +104,42 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: SizedBox(
                         width: double.infinity,
                         height: 56,
-                        child: FilledButton.tonal(
-                          onPressed:() async {
-                            try {
-                              await FirebaseAuth.instance.signInWithEmailAndPassword(
-                                email: emailController.text,
-                                password: passwordController.text,
-                              );
+                        child: FilledButton.tonal(onPressed: () async {
+                          try {
+                            await FirebaseAuth.instance.signInWithEmailAndPassword(
+                              email: emailController.text,
+                              password: passwordController.text,
+                            );
 
+                            setState(() {
+                              loginButtonText = "Login Successful";
+                            });
+
+                            // Fetch data for the new user
+                            await Future.wait([
+                              Provider.of<ItemProvider>(context, listen: false).fetchItems(),
+                              Provider.of<RecipeProvider>(context, listen: false).fetchRecipes(),
+                            ]);
+
+                            if (!context.mounted) return;
+                            context.go('/');
+                          } on FirebaseAuthException catch (e) {
+                            if (e.code == 'user-not-found' || e.code == 'wrong-password') {
                               setState(() {
-                                loginButtonText = "Login Successful";
-                                Provider.of<ItemProvider>(context, listen: false).fetchItems();
-                                Provider.of<RecipeProvider>(context, listen: false).fetchRecipes();
+                                loginButtonText = "Incorrect email or password";
                               });
-
-                              await Future.delayed(Duration(seconds: 2));
-
-                              if (!context.mounted) return;  // Prevents navigation if widget is unmounted
-                              context.go('/');
-                            } on FirebaseAuthException catch (e) {
-                              if (e.code == 'user-not-found' || e.code == 'wrong-password') {
-                                setState(() {
-                                  loginButtonText = "Incorrect email or password";
-                                });
-                              } else {
-                                setState(() {
-                                  loginButtonText = "Invalid email or password";
-                                });
-                              }
-
-                              await Future.delayed(Duration(seconds: 3));
+                            } else {
                               setState(() {
-                                loginButtonText = "Login";
+                                loginButtonText = "Invalid email or password";
                               });
                             }
-                          },
+
+                            await Future.delayed(Duration(seconds: 3));
+                            setState(() {
+                              loginButtonText = "Login";
+                            });
+                          }
+                        },
                           style: ButtonStyle(
                             backgroundColor:
                             WidgetStateProperty.all(Colors.transparent),

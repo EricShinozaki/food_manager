@@ -12,7 +12,6 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  @override
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   final emailController =  TextEditingController();
@@ -203,20 +202,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ],
             ),
           )
-          /*
-           FloatingActionButton(
-             onPressed: () {
-               showDialog(
-                 context: context,
-                 builder: (context) {
-                   return AlertDialog(
-                     content: Text("password: ${passwordController.text} email: ${emailController.text}"),
-                   );
-                 },
-               );
-             }
-           )
-           */
         ],
       ),
     );

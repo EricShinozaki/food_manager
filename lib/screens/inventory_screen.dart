@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:food_manager/ItemProvider.dart';
+import 'package:food_manager/item_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -15,38 +15,42 @@ class _InventoryScreenState extends State<InventoryScreen> {
   final TextEditingController _searchKey = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  List<Item> _allItemsList = [];
   List<Item> _filteredItemsList = [];
 
   @override
   void initState() {
     super.initState();
-    final itemProvider = Provider.of<ItemProvider>(context, listen: false);
-    _allItemsList = itemProvider.items;
-    _filteredItemsList = itemProvider.items;
+    _searchKey.addListener(_onSearchChanged);
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final itemProvider = Provider.of<ItemProvider>(context, listen: false);
-    setState(() {
-      _allItemsList = List.from(itemProvider.items);
-      _filteredItemsList = List.from(itemProvider.items);
-    });
+  void dispose() {
+    _searchKey.removeListener(_onSearchChanged);
+    _searchKey.dispose();
+    super.dispose();
   }
 
-  void _filterItemsListBySearchText(String searchText) {
+  void _onSearchChanged() {
+    final searchText = _searchKey.text.toLowerCase();
+    final allItems = context.read<ItemProvider>().items;
+
     setState(() {
-      _filteredItemsList = _allItemsList
-          .where((item) =>
-          item.name.toLowerCase().contains(searchText.toLowerCase()))
+      _filteredItemsList = allItems
+          .where((item) => item.name.toLowerCase().contains(searchText))
           .toList();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final itemProvider = Provider.of<ItemProvider>(context);
+    final allItems = itemProvider.items;
+
+    // Update list if search is empty or initial load
+    if (_searchKey.text.isEmpty && _filteredItemsList.length != allItems.length) {
+      _filteredItemsList = List.from(allItems);
+    }
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -61,44 +65,30 @@ class _InventoryScreenState extends State<InventoryScreen> {
           child: TextField(
             controller: _searchKey,
             decoration: InputDecoration(
-              prefixIcon: IconButton(
-                icon: Icon(
-                  Icons.search_rounded,
-                  color: Theme.of(context).primaryColorDark,
-                ),
-                onPressed: () => FocusScope.of(context).unfocus(),
-              ),
+              prefixIcon: Icon(Icons.search_rounded, color: Theme.of(context).primaryColorDark),
               suffixIcon: IconButton(
-                icon: Icon(
-                  Icons.clear_rounded,
-                  color: Theme.of(context).primaryColorDark,
-                ),
+                icon: Icon(Icons.clear_rounded, color: Theme.of(context).primaryColorDark),
                 onPressed: () {
                   _searchKey.clear();
-                  _filterItemsListBySearchText('');
+                  FocusScope.of(context).unfocus();
                 },
               ),
               hintText: 'Search...',
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(vertical: 10),
+              contentPadding: const EdgeInsets.symmetric(vertical: 10),
             ),
-            onChanged: _filterItemsListBySearchText,
-            onSubmitted: _filterItemsListBySearchText,
           ),
         ),
-        iconTheme: IconThemeData(
-          color: Theme.of(context).primaryColorDark,
-        ),
+        iconTheme: IconThemeData(color: Theme.of(context).primaryColorDark),
         elevation: 0,
       ),
       body: GestureDetector(
-        onTap: () {
-          // Prevent the screen from unfocusing when tapping outside
-          FocusScope.of(context).requestFocus(FocusNode());
-        },
+        onTap: () => FocusScope.of(context).unfocus(),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: ListView.builder(
+          child: _filteredItemsList.isEmpty
+              ? const Center(child: Text('No items found.'))
+              : ListView.builder(
             itemCount: _filteredItemsList.length,
             itemBuilder: (context, index) {
               final item = _filteredItemsList[index];
@@ -129,10 +119,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Quantity: ${item.quantity} ${item.unit}",
-              style: const TextStyle(fontSize: 15),
-            ),
+            Text("Quantity: ${item.quantity} ${item.unit}", style: const TextStyle(fontSize: 15)),
           ],
         ),
         trailing: item.expirationDate != null
@@ -161,7 +148,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       builder: (context) {
         return Container(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.3, // Allow scrolling if content is tall
+            maxHeight: MediaQuery.of(context).size.height * 0.35,
           ),
           width: double.infinity,
           padding: const EdgeInsets.all(16.0),
@@ -186,14 +173,14 @@ class _InventoryScreenState extends State<InventoryScreen> {
         Expanded(
           child: Text(
             item.name,
-            style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
           ),
         ),
         Align(
           alignment: Alignment.topRight,
           child: IconButton(
             onPressed: () => Navigator.of(context).pop(),
-            icon: Icon(Icons.expand_circle_down_sharp),
+            icon: const Icon(Icons.expand_circle_down_sharp),
           ),
         ),
       ],
@@ -202,18 +189,18 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
   Widget _buildItemDetails(Item item) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Quantity: ${item.quantity} ${item.unit}", style: TextStyle(fontSize: 16)),
+        Text("Quantity: ${item.quantity} ${item.unit}", style: const TextStyle(fontSize: 16)),
         const SizedBox(height: 10),
-        Text("Notes: ${item.note}", style: TextStyle(fontSize: 16)),
+        Text("Notes: ${item.note}", style: const TextStyle(fontSize: 16)),
         const SizedBox(height: 10),
-        Text("Nutrition: ${getNutritionString(item)}", style: TextStyle(fontSize: 16)),
-        const SizedBox(height: 20),
+        Text("Nutrition: ${getNutritionString(item)}", style: const TextStyle(fontSize: 16)),
       ],
     );
   }
 
   String getNutritionString(Item item) {
-    return item.nutrition.isEmpty ? "N/A" : item.nutrition.join("\n");
+    return item.nutrition.isEmpty ? "N/A" : item.nutrition.join(", ");
   }
 }

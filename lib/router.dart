@@ -16,8 +16,8 @@ import 'package:food_manager/screens/scanning_screen.dart';
 import 'package:food_manager/screens/settings_screen.dart';
 import 'package:food_manager/screens/sign_up_screen.dart';
 import 'package:food_manager/screens/splash_screen.dart';
-import 'package:food_manager/screens/viewReceiptScreen.dart';
-import 'package:food_manager/widgets/homeNavigationBar.dart';
+import 'package:food_manager/screens/view_receipt_screen.dart';
+import 'package:food_manager/widgets/home_navigation_bar.dart';
 import 'package:go_router/go_router.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -117,7 +117,10 @@ final GoRouter _router =  GoRouter(
       GoRoute(
         name: "login",
         path: '/login',
-        builder: (context, state) => LoginScreen(title: "Login"),
+        builder: (context, state) {
+          final email = state.extra as String?;
+          return LoginScreen(title: "Login", email: email ?? "");
+        },
         routes: [
           GoRoute(
             name: "forgotPassword",

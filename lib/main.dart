@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:food_manager/ItemProvider.dart';
-import 'package:food_manager/recipeProvider.dart';
+import 'package:food_manager/item_provider.dart';
+import 'package:food_manager/recipe_provider.dart';
 import 'package:food_manager/router.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';

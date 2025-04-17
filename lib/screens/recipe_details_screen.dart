@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:food_manager/recipeProvider.dart';
-import 'package:go_router/go_router.dart';
+import 'package:food_manager/recipe_provider.dart';
 import 'package:provider/provider.dart';
 
 class RecipeDetailsScreen extends StatefulWidget {
@@ -30,7 +29,7 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                   children: [
                     Expanded( // Ensures ListView gets proper constraints
                       child: ListView.builder(
-                        itemCount: recipe.ingredients.length + recipe.nutrition!.length + 5,
+                        itemCount: recipe.ingredients.length + recipe.nutrition.length + 5,
                         itemBuilder: (context, index) {
                           if(index == 0) {
                             return ListTile(
@@ -58,7 +57,6 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                               title: Text("Nutrition facts", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
                             );
                           } else {
-                            //final nutritionFact = recipe.nutrition[index - 5 - recipe.ingredients.length]; // Adjust index to match ingredient list
                             return ListTile(
                               title: Text("Add later", style: TextStyle(fontSize: 20)),
                             );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:food_manager/ItemProvider.dart';
-import 'package:food_manager/recipeProvider.dart';
+import 'package:food_manager/item_provider.dart';
+import 'package:food_manager/recipe_provider.dart';
 import 'package:provider/provider.dart';
 
 class AddRecipeScreen extends StatefulWidget {

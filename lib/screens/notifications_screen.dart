@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key, required this.title});

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:food_manager/ItemProvider.dart';
+import 'package:food_manager/item_provider.dart';
 import 'package:food_manager/main.dart';
 
 class Recipe {
@@ -20,17 +20,37 @@ class Recipe {
   });
 }
 
-
 class RecipeProvider with ChangeNotifier {
   final FirebaseFirestore database = db;
-  User? user = FirebaseAuth.instance.currentUser;
+  User? user;  // Start with null, will be set by auth state listener
 
   List<Recipe> _recipes = [];
-
   List<Recipe> get recipes => _recipes;
 
+  RecipeProvider() {
+    // Listen for user authentication state changes
+    FirebaseAuth.instance.authStateChanges().listen((user) {
+      this.user = user;  // Set the user to the current Firebase user
+      if (user != null) {
+        fetchRecipes();  // Fetch recipes when the user logs in
+      } else {
+        _clearRecipes();  // Clear recipes if the user logs out
+      }
+      notifyListeners();
+    });
+  }
+
+  // Fetch recipes from Firestore for the logged-in user
   Future<void> fetchRecipes() async {
+    if (user == null) {
+      if (kDebugMode) {
+        print("User is not logged in.");
+      }
+      return;
+    }
+
     try {
+      _clearRecipes();
       final querySnapshot = await database
           .collection('users')
           .doc(user?.uid)
@@ -52,13 +72,17 @@ class RecipeProvider with ChangeNotifier {
       notifyListeners();
     } catch (error) {
       if (kDebugMode) {
-        print("Failed to fetch items: $error");
+        print("Failed to fetch recipes: $error");
       }
     }
   }
 
-    // Add recipe for logged-in user
+  // Add a recipe for the logged-in user
   Future<String> addRecipe(Recipe recipe) async {
+    if (user == null) {
+      return "User is not logged in.";
+    }
+
     try {
       final existingRecipeSnapshot = await database
           .collection('users')
@@ -82,6 +106,7 @@ class RecipeProvider with ChangeNotifier {
 
         _recipes.add(recipe);
         notifyListeners();
+        return "Successfully added recipe";
       } else {
         if (kDebugMode) {
           print("Recipe with this name already exists");
@@ -94,18 +119,20 @@ class RecipeProvider with ChangeNotifier {
       }
       return "Error: $error, please try again";
     }
-
-    return "Successfully added recipe";
   }
 
-  // Remove a recipe from Firestore by name for the logged-in user
+  // Remove a recipe from Firestore for the logged-in user
   Future<void> removeRecipe(String name) async {
+    if (user == null) {
+      return;
+    }
+
     try {
       final recipeSnapshot = await database
           .collection('users')
           .doc(user?.uid)
           .collection('recipes')
-          .where('name', isEqualTo: name)  // Find item by name
+          .where('name', isEqualTo: name)  // Find recipe by name
           .get();
 
       if (recipeSnapshot.docs.isNotEmpty) {
@@ -116,7 +143,7 @@ class RecipeProvider with ChangeNotifier {
             .doc(recipeSnapshot.docs.first.id)  // Delete the document by ID
             .delete();
 
-        _recipes.removeWhere((recipe) => recipe.name == name);  // Remove item locally
+        _recipes.removeWhere((recipe) => recipe.name == name);  // Remove locally
         notifyListeners();
       }
     } catch (error) {
@@ -126,42 +153,51 @@ class RecipeProvider with ChangeNotifier {
     }
   }
 
-  // Update a recipe in Firestore by name for the logged-in user
+  // Update a recipe in Firestore for the logged-in user
   Future<void> updateRecipe(Recipe recipe) async {
+    if (user == null) {
+      return;
+    }
+
     try {
       final recipesSnapshot = await database
           .collection('users')
           .doc(user?.uid)
           .collection('recipes')
-          .where('name', isEqualTo: recipe.name)  // Find item by name
+          .where('name', isEqualTo: recipe.name)  // Find recipe by name
           .get();
 
       if (recipesSnapshot.docs.isNotEmpty) {
         await database
             .collection('users')
             .doc(user?.uid)
-            .collection('items')
+            .collection('recipes')  // Correct path to 'recipes' collection
             .doc(recipesSnapshot.docs.first.id)  // Update the document by ID
             .update({
           'name': recipe.name,
-          'quantity': recipe.servings,
-          'unit': recipe.ingredients,
-          'note': recipe.instructions,
+          'servings': recipe.servings,
+          'ingredients': recipe.ingredients.map((item) => item.toMap()).toList(),
+          'instructions': recipe.instructions,
           'nutrition': recipe.nutrition,
         });
 
         // Update the local list as well
         int index = _recipes.indexWhere((i) => i.name == recipe.name);
         if (index != -1) {
-          _recipes[index] = recipe;  // Update item locally
+          _recipes[index] = recipe;  // Update locally
           notifyListeners();
         }
       }
     } catch (error) {
       if (kDebugMode) {
-        print("Failed to update item: $error");
+        print("Failed to update recipe: $error");
       }
     }
   }
-}
 
+  // Clear the local recipe list
+  void _clearRecipes() {
+    _recipes = [];
+    notifyListeners();
+  }
+}

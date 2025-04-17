@@ -1,9 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:food_manager/main.dart';
 
 class Item {
@@ -50,31 +47,43 @@ class Item {
 
 class ItemProvider with ChangeNotifier {
   final FirebaseFirestore database = db;
-  User? user = FirebaseAuth.instance.currentUser;
+  User? user;
 
   List<Item> _items = [];
   List<Item> get items => _items;
 
-  // Fetch items from Firestore for the logged-in user
+  ItemProvider() {
+    // Listen for changes in user authentication state
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      this.user = user;
+      // If the user is logged in, fetch their items
+      if (user != null) {
+        fetchItems();  // Optional: Fetch items when the user is logged in
+      } else {
+        _clearItems();  // Clear items if the user is logged out
+      }
+      notifyListeners();  // Notify listeners that the user state has changed
+    });
+  }
+
   Future<void> fetchItems() async {
+    if (user == null) {
+      if (kDebugMode) {
+        print("User is not logged in.");
+      }
+      return;
+    }
+
     try {
+      _clearItems();
       final querySnapshot = await database
           .collection('users')
-          .doc(user?.uid)  // Use the user ID to fetch items specific to the user
-          .collection('items')  // This will now be under the user's document
+          .doc(user?.uid)
+          .collection('items')
           .get();
 
       _items = querySnapshot.docs.map((doc) {
-        return Item(
-          name: doc['name'],
-          quantity: doc['quantity'].toDouble(),
-          unit: doc['unit'],
-          note: doc['note'],
-          nutrition: List<String>.from(doc['nutrition']),
-          expirationDate: doc['expirationDate'] != null
-              ? (doc['expirationDate'] as Timestamp).toDate() // Convert Firestore Timestamp to DateTime
-              : null,
-        );
+        return Item.fromFireStore(doc.data());
       }).toList();
 
       notifyListeners();
@@ -85,38 +94,29 @@ class ItemProvider with ChangeNotifier {
     }
   }
 
-  // Add an item to Firestore for the logged-in user
   Future<String> addItem(Item item) async {
+    if (user == null) {
+      return "User is not logged in.";
+    }
+
     try {
-      // Check if the item with the same name already exists
       final existingItemSnapshot = await database
           .collection('users')
           .doc(user?.uid)
           .collection('items')
-          .where('name', isEqualTo: item.name)  // Check by item name
+          .where('name', isEqualTo: item.name)
           .get();
 
       if (existingItemSnapshot.docs.isEmpty) {
-        // Add the item only if it doesn't exist
         await database
             .collection('users')
             .doc(user?.uid)
             .collection('items')
-            .add({
-          'name': item.name,
-          'quantity': item.quantity,
-          'unit': item.unit,
-          'note': item.note,
-          'nutrition': item.nutrition,
-          'expirationDate': item.expirationDate != null
-              ? Timestamp.fromDate(item.expirationDate!) // Convert DateTime to Firestore Timestamp
-              : null,
-        });
+            .add(item.toMap());
 
-        _items.add(item);  // Add item locally
+        _items.add(item);
         notifyListeners();
         return "Item added successfully";
-
       } else {
         if (kDebugMode) {
           print("Item with this name already exists");
@@ -131,14 +131,17 @@ class ItemProvider with ChangeNotifier {
     }
   }
 
-  // Remove an item from Firestore by name for the logged-in user
   Future<void> removeItem(String name) async {
+    if (user == null) {
+      return;
+    }
+
     try {
       final itemSnapshot = await database
           .collection('users')
           .doc(user?.uid)
           .collection('items')
-          .where('name', isEqualTo: name)  // Find item by name
+          .where('name', isEqualTo: name)
           .get();
 
       if (itemSnapshot.docs.isNotEmpty) {
@@ -146,10 +149,10 @@ class ItemProvider with ChangeNotifier {
             .collection('users')
             .doc(user?.uid)
             .collection('items')
-            .doc(itemSnapshot.docs.first.id)  // Delete the document by ID
+            .doc(itemSnapshot.docs.first.id)
             .delete();
 
-        _items.removeWhere((item) => item.name == name);  // Remove item locally
+        _items.removeWhere((item) => item.name == name);
         notifyListeners();
       }
     } catch (error) {
@@ -159,14 +162,17 @@ class ItemProvider with ChangeNotifier {
     }
   }
 
-  // Update an item in Firestore by name for the logged-in user
   Future<void> updateItem(Item item) async {
+    if (user == null) {
+      return;
+    }
+
     try {
       final itemSnapshot = await database
           .collection('users')
           .doc(user?.uid)
           .collection('items')
-          .where('name', isEqualTo: item.name)  // Find item by name
+          .where('name', isEqualTo: item.name)
           .get();
 
       if (itemSnapshot.docs.isNotEmpty) {
@@ -174,22 +180,12 @@ class ItemProvider with ChangeNotifier {
             .collection('users')
             .doc(user?.uid)
             .collection('items')
-            .doc(itemSnapshot.docs.first.id)  // Update the document by ID
-            .update({
-          'name': item.name,
-          'quantity': item.quantity,
-          'unit': item.unit,
-          'note': item.note,
-          'nutrition': item.nutrition,
-          'expirationDate': item.expirationDate != null
-              ? Timestamp.fromDate(item.expirationDate!) // Convert DateTime to Firestore Timestamp
-              : null,
-        });
+            .doc(itemSnapshot.docs.first.id)
+            .update(item.toMap());
 
-        // Update the local list as well
         int index = _items.indexWhere((i) => i.name == item.name);
         if (index != -1) {
-          _items[index] = item;  // Update item locally
+          _items[index] = item;
           notifyListeners();
         }
       }
@@ -209,4 +205,10 @@ class ItemProvider with ChangeNotifier {
     _items.sort((a, b) => a.quantity.compareTo(b.quantity));
     notifyListeners();
   }
+
+  void _clearItems() {
+    _items = [];
+    notifyListeners();
+  }
 }
+
