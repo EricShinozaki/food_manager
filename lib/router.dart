@@ -6,7 +6,6 @@ import 'package:food_manager/screens/add_recipe_screen.dart';
 import 'package:food_manager/screens/forgot_password.dart';
 import 'package:food_manager/screens/home_screen.dart';
 import 'package:food_manager/screens/inventory_screen.dart';
-import 'package:food_manager/screens/item_details_screen.dart';
 import 'package:food_manager/screens/login_screen.dart';
 import 'package:food_manager/screens/recipe_details_screen.dart';
 import 'package:food_manager/screens/recipes_screen.dart';
@@ -52,16 +51,6 @@ final GoRouter _router =  GoRouter(
                         final recipeName = state.pathParameters['name']!;
                         return RecipeDetailsScreen(title: recipeName);
                       },
-                      routes: [
-                        GoRoute(
-                          name: "ingredientDetails",
-                          path: "ingredientDetails/:ingredientName",
-                          builder: (context, state) {
-                            final ingredient = state.pathParameters['ingredientName']!;
-                            return ItemDetailsScreen(title: ingredient);
-                          },
-                        )
-                      ]
                     ),
                   ]
               ),
@@ -69,27 +58,12 @@ final GoRouter _router =  GoRouter(
                 name: "scan",
                 path: 'scanning',
                 builder: (context, state) => ScanningScreen(title: "Scan"),
-                routes: [
-                  GoRoute(
-                    name: "scannedItemDetails",
-                    path: 'scannedItemDetails',
-                    builder: (context, state) => ItemDetailsScreen(title: "Item Details"),
-                  ),
-                ],
               ),
               GoRoute(
                   name: "inventory",
                   path: 'inventory',
                   builder: (context, state) => InventoryScreen(),
                   routes: [
-                    GoRoute(
-                        name: "itemDetails",
-                        path: 'itemDetails/:name',
-                        builder: (context, state) {
-                        final ingredientName = state.pathParameters['name']!;
-                        return ItemDetailsScreen(title: ingredientName);
-                      }
-                    ),
                     GoRoute(
                       name: "addItem",
                       path: 'addItem',

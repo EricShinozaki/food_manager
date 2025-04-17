@@ -53,9 +53,14 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                               title: Text(recipe.instructions, style: TextStyle(fontSize: 20)),
                             );
                           } else if(index == recipe.ingredients.length + 4){
-                            return ListTile(
-                              title: Text("Nutrition facts", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
-                            );
+                            if(index == recipe.ingredients.length + 4){
+                              return null;
+                            } else {
+                              return ListTile(
+                                title: Text("Nutrition facts", style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 25)),
+                              );
+                            }
                           } else {
                             return ListTile(
                               title: Text("Add later", style: TextStyle(fontSize: 20)),

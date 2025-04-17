@@ -120,7 +120,13 @@ class _RecipesScreenState extends State<RecipesScreen> {
         onTap: () {
           context.go('/recipes/recipeDetails/${recipe.name}');
         },
-      ),
+        trailing: IconButton(
+          onPressed: () {
+            context.go('/recipes/editRecipe');
+            },
+          icon: Icon(Icons.edit),
+        ),
+      )
     );
   }
 }
