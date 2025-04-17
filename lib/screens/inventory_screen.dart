@@ -159,11 +159,11 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   ),
                   const Divider(),
                   ListTile(
-                    leading: const Icon(Icons.edit),
-                    title: const Text('Edit'),
+                    leading: const Icon(Icons.add_circle_outline),
+                    title: const Text('Add quantity'),
                     onTap: () {
                       Navigator.pop(context);
-                      context.go('/inventory/editItem/${item.name}');
+                      _showAddQuantityDialog(context, item, itemProvider);
                     },
                   ),
                   ListTile(
@@ -212,6 +212,46 @@ class _InventoryScreenState extends State<InventoryScreen> {
                 final amount = double.tryParse(controller.text);
                 if (amount != null && amount > 0) {
                   final newQty = (item.quantity - amount).clamp(0, double.infinity);
+                  final updatedItem = Item(
+                    name: item.name,
+                    quantity: newQty.toDouble(),
+                    unit: item.unit,
+                    note: item.note,
+                    expirationDate: item.expirationDate,
+                    nutrition: item.nutrition,
+                  );
+                  provider.updateItem(updatedItem);
+                }
+                Navigator.pop(context);
+              },
+              child: const Text('Use'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAddQuantityDialog(BuildContext context, Item item, ItemProvider provider) {
+    final TextEditingController controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Add ${item.name}"),
+          content: TextField(
+            controller: controller,
+            keyboardType: TextInputType.numberWithOptions(decimal: true),
+            decoration: const InputDecoration(labelText: 'Enter quantity to use'),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () {
+                final amount = double.tryParse(controller.text);
+                if (amount != null && amount > 0) {
+                  final newQty = (item.quantity + amount).clamp(0, double.infinity);
                   final updatedItem = Item(
                     name: item.name,
                     quantity: newQty.toDouble(),
