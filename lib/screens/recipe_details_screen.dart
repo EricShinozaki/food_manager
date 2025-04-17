@@ -16,64 +16,89 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
   Widget build(BuildContext context) {
     final recipeProvider = Provider.of<RecipeProvider>(context);
     final recipe = recipeProvider.recipes.firstWhere((recipe) => recipe.name == widget.title);
+
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          title: Text(widget.title),
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              flex: 100,
-              child: Column(
-                  children: [
-                    Expanded( // Ensures ListView gets proper constraints
-                      child: ListView.builder(
-                        itemCount: recipe.ingredients.length + recipe.nutrition.length + 5,
-                        itemBuilder: (context, index) {
-                          if(index == 0) {
-                            return ListTile(
-                              title: Text("Servings: ${recipe.servings}", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
-                            );
-                          } else if (index == 1) {
-                            return ListTile(
-                              title: Text("Ingredients List", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
-                            );
-                          } else if(index > 1 && index < recipe.ingredients.length + 2){
-                            final ingredient = recipe.ingredients[index - 2]; // Adjust index to match ingredient list
-                            return ListTile(
-                              title: Text("${ingredient.quantity} ${ingredient.unit} ${ingredient.name}", style: TextStyle(fontSize: 20)),
-                            );
-                          } else if(index == recipe.ingredients.length + 2){
-                            return ListTile(
-                              title: Text("Instructions", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
-                            );
-                          } else if(index == recipe.ingredients.length + 3){
-                            return ListTile(
-                              title: Text(recipe.instructions, style: TextStyle(fontSize: 20)),
-                            );
-                          } else if(index == recipe.ingredients.length + 4){
-                            if(index == recipe.ingredients.length + 4){
-                              return null;
-                            } else {
-                              return ListTile(
-                                title: Text("Nutrition facts", style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 25)),
-                              );
-                            }
-                          } else {
-                            return ListTile(
-                              title: Text("Add later", style: TextStyle(fontSize: 20)),
-                            );
-                          }
-                        },
-                      ),
-                    ),
-                  ]
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(widget.title),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(8.0),
+        children: [
+          // Servings
+          ListTile(
+            title: Text(
+              "Servings: ${recipe.servings}",
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+            ),
+          ),
+
+          // Ingredients header
+          const ListTile(
+            title: Text(
+              "Ingredients List",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+            ),
+          ),
+
+          // Ingredients list
+          ...recipe.ingredients.map((ingredient) => ListTile(
+            title: Text(
+              "${ingredient.quantity} ${ingredient.unit} ${ingredient.name}",
+              style: const TextStyle(fontSize: 20),
+            ),
+          )),
+
+          // Instructions header
+          const ListTile(
+            title: Text(
+              "Instructions",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+            ),
+          ),
+
+          // Instructions content
+          ListTile(
+            title: Text(
+              recipe.instructions,
+              style: const TextStyle(fontSize: 20),
+            ),
+          ),
+
+          // Nutrition header and content
+          if (recipe.nutrition.isNotEmpty) ...[
+            const ListTile(
+              title: Text(
+                "Nutrition Facts",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
               ),
             ),
+            ...recipe.nutrition.map((fact) => ListTile(
+              title: Text(
+                fact,
+                style: const TextStyle(fontSize: 20),
+              ),
+            )),
           ],
-        )
+
+          ...[
+            if (recipe.nutrition.isNotEmpty)
+              const ListTile(
+                title: Text(
+                  "Nutrition",
+                  style: TextStyle(fontSize: 20, color: Colors.grey),
+                ),
+              ),
+
+            ...recipe.nutrition.map((nutritionData) => ListTile(
+              title: Text(
+                nutritionData,
+                style: const TextStyle(fontSize: 20),
+              ),
+            )),
+          ],
+        ],
+      ),
     );
   }
 }
