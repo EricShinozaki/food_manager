@@ -9,26 +9,9 @@ class HomeNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     // Get the current route
     final String location = GoRouterState.of(context).uri.path;
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      body: Stack(
-        children: [
-          child, // Your main body content here
-          if (location != '/settings') // Only show button on non-settings pages
-            Positioned(
-              top: screenHeight * 0.04, // 5% of screen height
-              right: screenWidth * 0.005, // 5% of screen width
-              child: IconButton(
-                onPressed: () => context.push('/settings'),
-                icon: Icon(Icons.settings),
-              ),
-            ),
-        ],
-      ),
-      bottomNavigationBar: location != 'settings'
-        ? NavigationBar(
+      bottomNavigationBar: NavigationBar(
         selectedIndex: _getIndex(location), // Determine selected tab
         onDestinationSelected: (index) {
           context.go(_getPath(index)); // Navigate on tap
@@ -38,10 +21,9 @@ class HomeNavigationBar extends StatelessWidget {
           NavigationDestination(icon: Icon(Icons.inventory_2), label: 'Inventory'),
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
           NavigationDestination(icon: Icon(Icons.crop_free), label: 'Scan'),
-          NavigationDestination(icon: Icon(Icons.notification_add), label: 'Notifications'),
+          NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
         ],
       )
-          : null,
     );
   }
 
@@ -53,8 +35,8 @@ class HomeNavigationBar extends StatelessWidget {
       return 1;  // Inventory tab
     } else if (location.startsWith('/scanning')) {
       return 3;  // Scan tab
-    } else if (location.startsWith('/notifications')) {
-      return 4;  // Notifications tab
+    } else if (location.startsWith('/settings')) {
+      return 4;  // settings tab
     }
 
     // Default to Home tab if no match
@@ -62,6 +44,6 @@ class HomeNavigationBar extends StatelessWidget {
   }
 
   String _getPath(int index) {
-    return ['/recipes', '/inventory', '/', '/scanning', '/notifications'][index];
+    return ['/recipes', '/inventory', '/', '/scanning', '/settings'][index];
   }
 }

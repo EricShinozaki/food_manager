@@ -8,7 +8,6 @@ import 'package:food_manager/screens/home_screen.dart';
 import 'package:food_manager/screens/inventory_screen.dart';
 import 'package:food_manager/screens/item_details_screen.dart';
 import 'package:food_manager/screens/login_screen.dart';
-import 'package:food_manager/screens/notifications_screen.dart';
 import 'package:food_manager/screens/recipe_details_screen.dart';
 import 'package:food_manager/screens/recipes_screen.dart';
 import 'package:food_manager/screens/reset_password.dart';
@@ -99,16 +98,10 @@ final GoRouter _router =  GoRouter(
                   ]
               ),
               GoRoute(
-                name: "notifications",
-                path: 'notifications',
-                builder: (context, state) => NotificationsScreen(title: "Notifications"),
-                  routes: [
-                    GoRoute(
-                      name: "itemNotification",
-                      path: 'itemNotification',
-                      builder: (context, state) => ItemDetailsScreen(title: "Temporary Notification info"),
-                    ),
-                  ]
+                name: "settings",
+                path: '/settings',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (context, state) => SettingsScreen(title: "Settings"),
               ),
             ]
           ),
@@ -149,12 +142,6 @@ final GoRouter _router =  GoRouter(
           final file = state.extra as File?;
           return ViewReceiptScreen(imageFile: file);
         },
-      ),
-      GoRoute(
-        name: "settings",
-        path: '/settings',
-        parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => SettingsScreen(title: "Settings"),
       ),
       GoRoute(
         name: "splashScreen",
