@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:food_manager/item_provider.dart';
 import 'package:food_manager/theme/app_theme.dart';
@@ -16,12 +19,13 @@ class _AddItemScreenState extends State<AddItemScreen> {
   final _formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   final quantityController = TextEditingController();
-  final unitController = TextEditingController();
   final noteController = TextEditingController();
   final nutritionController = TextEditingController();
   final dateController = TextEditingController();
 
   List<String> nutritionData = [];
+  final List<String> units = ['tsp', 'tbsp', 'cup', 'pint', 'quart', 'gallon', 'oz', 'fl oz', 'lb', 'pieces'];
+  String? selectedUnit;
 
   void addNutrition() {
     final value = nutritionController.text.trim();
@@ -59,7 +63,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
     final item = Item(
       name: nameController.text.trim(),
       quantity: quantity ?? 0.0,
-      unit: unitController.text.trim(),
+      unit: selectedUnit ?? '',
       note: noteController.text.trim(),
       nutrition: nutritionData,
       expirationDate: date,
@@ -129,15 +133,50 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 label: 'Item Name',
                 validator: _requiredValidator,
               ),
-              buildTextField(
-                controller: quantityController,
-                label: 'Quantity',
-                validator: _requiredValidator,
-                keyboardType: TextInputType.number,
-              ),
-              buildTextField(
-                controller: unitController,
-                label: 'Unit (e.g., kg, L, pieces)',
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: quantityController,
+                        validator: _requiredValidator,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: 'Quantity',
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    SizedBox(
+                      width: max(MediaQuery.sizeOf(context).width * 0.3, 108.0),
+                      child: DropdownButtonFormField2(
+                        value: selectedUnit,
+                        decoration: InputDecoration(
+                          labelText: 'Unit',
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
+                        isExpanded: true,
+                        dropdownStyleData: DropdownStyleData(
+                          width: max(MediaQuery.sizeOf(context).width * 0.30, 108.0),
+                          maxHeight: MediaQuery.sizeOf(context).height * 0.3,
+                        ), // <-- this controls the dropdown menu's width!
+                        items: units.map((unit) {
+                          return DropdownMenuItem(
+                            value: unit,
+                            child: Text(unit),
+                          );
+                        }).toList(),
+                        onChanged: (value) => setState(() => selectedUnit = value),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) return 'Select a unit';
+                          return null;
+                        },
+                      )
+                    ),
+                  ],
+                ),
               ),
               buildTextField(
                 controller: noteController,
@@ -223,11 +262,13 @@ class _AddItemScreenState extends State<AddItemScreen> {
                       if (result == "Item added successfully") {
                         nameController.clear();
                         quantityController.clear();
-                        unitController.clear();
                         noteController.clear();
                         dateController.clear();
                         nutritionController.clear();
-                        setState(() => nutritionData.clear());
+                        setState(() {
+                          selectedUnit = null;
+                          nutritionData.clear();
+                        });
                       }
                     }
                   },
