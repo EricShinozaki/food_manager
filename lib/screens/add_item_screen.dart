@@ -169,10 +169,6 @@ class _AddItemScreenState extends State<AddItemScreen> {
                           );
                         }).toList(),
                         onChanged: (value) => setState(() => selectedUnit = value),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) return 'Select a unit';
-                          return null;
-                        },
                       )
                     ),
                   ],

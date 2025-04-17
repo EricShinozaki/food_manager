@@ -210,7 +210,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
             TextButton(
               onPressed: () {
                 final amount = double.tryParse(controller.text);
-                if (amount != null && amount > 0) {
+                String result = "Used $amount ${item.name}";
+                if (amount != null && amount > 0 && item.quantity >= amount) {
                   final newQty = (item.quantity - amount).clamp(0, double.infinity);
                   final updatedItem = Item(
                     name: item.name,
@@ -221,8 +222,21 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     nutrition: item.nutrition,
                   );
                   provider.updateItem(updatedItem);
+                } else {
+                  result = "Not enough ${item.name}";
                 }
                 Navigator.pop(context);
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text(result),
+                        actions: [
+                          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+                        ]
+                      );
+                    },
+                );
               },
               child: const Text('Use'),
             ),
