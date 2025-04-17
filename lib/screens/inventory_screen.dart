@@ -126,15 +126,29 @@ class _InventoryScreenState extends State<InventoryScreen> {
             ? Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.calendar_today, size: 18),
-            const SizedBox(height: 4),
+            Text(
+                "Expires",
+                style: const TextStyle(fontSize: 14),
+            ),
             Text(
               DateFormat('MM/dd/yyyy').format(item.expirationDate!),
-              style: const TextStyle(fontSize: 15),
+              style: const TextStyle(fontSize: 14),
             ),
           ],
         )
-            : null,
+            : Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Expires",
+              style: const TextStyle(fontSize: 14),
+            ),
+            Text(
+              "N/A",
+              style: const TextStyle(fontSize: 14),
+            ),
+          ],
+        ),
         onTap: () => _showItemDetailsBottomSheet(context, item),
       ),
     );

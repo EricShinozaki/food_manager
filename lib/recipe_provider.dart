@@ -10,6 +10,7 @@ class Recipe {
   List<Item> ingredients;
   String instructions;
   List<String> nutrition;
+  String? link; // Optional link field
 
   Recipe({
     required this.name,
@@ -17,30 +18,29 @@ class Recipe {
     required this.ingredients,
     required this.instructions,
     this.nutrition = const [],
+    this.link,
   });
 }
 
 class RecipeProvider with ChangeNotifier {
   final FirebaseFirestore database = db;
-  User? user;  // Start with null, will be set by auth state listener
+  User? user;
 
   List<Recipe> _recipes = [];
   List<Recipe> get recipes => _recipes;
 
   RecipeProvider() {
-    // Listen for user authentication state changes
     FirebaseAuth.instance.authStateChanges().listen((user) {
-      this.user = user;  // Set the user to the current Firebase user
+      this.user = user;
       if (user != null) {
-        fetchRecipes();  // Fetch recipes when the user logs in
+        fetchRecipes();
       } else {
-        _clearRecipes();  // Clear recipes if the user logs out
+        _clearRecipes();
       }
       notifyListeners();
     });
   }
 
-  // Fetch recipes from Firestore for the logged-in user
   Future<void> fetchRecipes() async {
     if (user == null) {
       if (kDebugMode) {
@@ -58,14 +58,16 @@ class RecipeProvider with ChangeNotifier {
           .get();
 
       _recipes = querySnapshot.docs.map((doc) {
+        final data = doc.data();
         return Recipe(
-          name: doc['name'],
-          servings: doc['servings'],
-          ingredients: (doc['ingredients'] as List).map((ingredientData) {
+          name: data['name'],
+          servings: data['servings'],
+          ingredients: (data['ingredients'] as List).map((ingredientData) {
             return Item.fromFireStore(ingredientData);
           }).toList(),
-          instructions: doc['instructions'],
-          nutrition: List<String>.from(doc['nutrition']),
+          instructions: data['instructions'],
+          nutrition: List<String>.from(data['nutrition']),
+          link: data.containsKey('link') ? data['link'] : null,
         );
       }).toList();
 
@@ -77,7 +79,6 @@ class RecipeProvider with ChangeNotifier {
     }
   }
 
-  // Add a recipe for the logged-in user
   Future<String> addRecipe(Recipe recipe) async {
     if (user == null) {
       return "User is not logged in.";
@@ -92,17 +93,20 @@ class RecipeProvider with ChangeNotifier {
           .get();
 
       if (existingRecipeSnapshot.docs.isEmpty) {
-        await database
-            .collection('users')
-            .doc(user?.uid)
-            .collection('recipes')
-            .add({
+        final newRecipe = {
           'name': recipe.name,
           'servings': recipe.servings,
           'ingredients': recipe.ingredients.map((item) => item.toMap()).toList(),
           'instructions': recipe.instructions,
           'nutrition': recipe.nutrition,
-        });
+          if (recipe.link != null) 'link': recipe.link,
+        };
+
+        await database
+            .collection('users')
+            .doc(user?.uid)
+            .collection('recipes')
+            .add(newRecipe);
 
         _recipes.add(recipe);
         notifyListeners();
@@ -121,7 +125,6 @@ class RecipeProvider with ChangeNotifier {
     }
   }
 
-  // Remove a recipe from Firestore for the logged-in user
   Future<void> removeRecipe(String name) async {
     if (user == null) {
       return;
@@ -132,7 +135,7 @@ class RecipeProvider with ChangeNotifier {
           .collection('users')
           .doc(user?.uid)
           .collection('recipes')
-          .where('name', isEqualTo: name)  // Find recipe by name
+          .where('name', isEqualTo: name)
           .get();
 
       if (recipeSnapshot.docs.isNotEmpty) {
@@ -140,10 +143,10 @@ class RecipeProvider with ChangeNotifier {
             .collection('users')
             .doc(user?.uid)
             .collection('recipes')
-            .doc(recipeSnapshot.docs.first.id)  // Delete the document by ID
+            .doc(recipeSnapshot.docs.first.id)
             .delete();
 
-        _recipes.removeWhere((recipe) => recipe.name == name);  // Remove locally
+        _recipes.removeWhere((recipe) => recipe.name == name);
         notifyListeners();
       }
     } catch (error) {
@@ -153,7 +156,6 @@ class RecipeProvider with ChangeNotifier {
     }
   }
 
-  // Update a recipe in Firestore for the logged-in user
   Future<void> updateRecipe(Recipe recipe) async {
     if (user == null) {
       return;
@@ -164,27 +166,29 @@ class RecipeProvider with ChangeNotifier {
           .collection('users')
           .doc(user?.uid)
           .collection('recipes')
-          .where('name', isEqualTo: recipe.name)  // Find recipe by name
+          .where('name', isEqualTo: recipe.name)
           .get();
 
       if (recipesSnapshot.docs.isNotEmpty) {
-        await database
-            .collection('users')
-            .doc(user?.uid)
-            .collection('recipes')  // Correct path to 'recipes' collection
-            .doc(recipesSnapshot.docs.first.id)  // Update the document by ID
-            .update({
+        final updatedRecipe = {
           'name': recipe.name,
           'servings': recipe.servings,
           'ingredients': recipe.ingredients.map((item) => item.toMap()).toList(),
           'instructions': recipe.instructions,
           'nutrition': recipe.nutrition,
-        });
+          if (recipe.link != null) 'link': recipe.link,
+        };
 
-        // Update the local list as well
+        await database
+            .collection('users')
+            .doc(user?.uid)
+            .collection('recipes')
+            .doc(recipesSnapshot.docs.first.id)
+            .update(updatedRecipe);
+
         int index = _recipes.indexWhere((i) => i.name == recipe.name);
         if (index != -1) {
-          _recipes[index] = recipe;  // Update locally
+          _recipes[index] = recipe;
           notifyListeners();
         }
       }
@@ -195,7 +199,6 @@ class RecipeProvider with ChangeNotifier {
     }
   }
 
-  // Clear the local recipe list
   void _clearRecipes() {
     _recipes = [];
     notifyListeners();

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:food_manager/item_provider.dart';
 import 'package:food_manager/recipe_provider.dart';
+import 'package:food_manager/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 
 class AddRecipeScreen extends StatefulWidget {
@@ -17,6 +18,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   final ingredientsController = TextEditingController();
   final instructionController = TextEditingController();
   final nutritionController = TextEditingController();
+  final linkController = TextEditingController();
   final unitController = TextEditingController();
   final ingredientNameController = TextEditingController();
   final quantityController = TextEditingController();
@@ -71,6 +73,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       ingredients: ingredientList,
       instructions: instructionController.text,
       nutrition: nutritionData,
+      link: linkController.text.isNotEmpty ? linkController.text : null
     );
 
     return await recipeProvider.addRecipe(recipe);
@@ -140,7 +143,9 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
           key: _formKey,
           child: Column(
             children: [
+              SizedBox(height: 10),
               _buildTextField('Recipe Name', nameController, _requiredValidator),
+              _buildTextField('Link to recipe', linkController, null),
               _buildTextField('Servings', servingsController, null, isFormField: false),
 
               Container(
@@ -149,11 +154,11 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   key: _ingredientFormKey,
                   child: Row(
                     children: [
-                      _buildIngredientField('Ingredient', ingredientNameController, _ingredientRequiredValidator),
-                      const SizedBox(width: 10),
                       _buildIngredientField('Quantity', quantityController, _requiredDoubleValidator),
                       const SizedBox(width: 10),
                       _buildIngredientField('Unit', unitController, null),
+                      const SizedBox(width: 10),
+                      _buildIngredientField('Ingredient', ingredientNameController, _ingredientRequiredValidator),
                       IconButton(
                         icon: const Icon(Icons.add),
                         onPressed: () {
@@ -198,6 +203,52 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   nutritionData.removeAt(index);
                 });
               }),
+              FilledButton(
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    String result = await add();
+                    if (!context.mounted) return;
+
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext dialogContext) => AlertDialog(
+                        content: Text(result, style: const TextStyle(fontSize: 18)),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(dialogContext),
+                            child: const Text('Close'),
+                          ),
+                        ],
+                      ),
+                    );
+
+
+                    if (result == "Recipe added successfully") {
+                      nameController.clear();
+                      quantityController.clear();
+                      unitController.clear();
+                      linkController.clear();
+                      servingsController.clear();
+                      nutritionController.clear();
+                      ingredientsController.clear();
+                      instructionController.clear();
+                      ingredientList.clear();
+                      nutritionData.clear();
+                      setState(() => nutritionData.clear());
+                    }
+                  }
+                },
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.buttonBackground,
+                  foregroundColor: AppColors.buttonText,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                ),
+                child: const Text("Add Item"),
+              ),
+              SizedBox(height: 20)
             ],
           ),
         ),
@@ -212,7 +263,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     );
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       child: isFormField
           ? TextFormField(
         controller: controller,
@@ -244,7 +295,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   Widget _buildListSection(String title, List<String> items, void Function(int) onDelete) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       child: Column(
         children: [
           Text(title, style: const TextStyle(fontSize: 20), textAlign: TextAlign.center),

@@ -209,11 +209,11 @@ class _AddItemScreenState extends State<AddItemScreen> {
 
                       showDialog(
                         context: context,
-                        builder: (_) => AlertDialog(
+                        builder: (BuildContext dialogContext) => AlertDialog(
                           content: Text(result, style: const TextStyle(fontSize: 18)),
                           actions: [
                             TextButton(
-                              onPressed: () => Navigator.pop(context),
+                              onPressed: () => Navigator.pop(dialogContext),
                               child: const Text('Close'),
                             ),
                           ],
