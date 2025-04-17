@@ -157,6 +157,86 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  void _showChangePasswordDialog(BuildContext context) {
+    final currentPasswordController = TextEditingController();
+    final newPasswordController = TextEditingController();
+    final confirmPasswordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Change Password"),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextField(
+                  controller: currentPasswordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: 'Current Password'),
+                ),
+                TextField(
+                  controller: newPasswordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: 'New Password'),
+                ),
+                TextField(
+                  controller: confirmPasswordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: 'Confirm New Password'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () async {
+                final currentPassword = currentPasswordController.text;
+                final newPassword = newPasswordController.text;
+                final confirmPassword = confirmPasswordController.text;
+
+                if (newPassword != confirmPassword) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("New passwords do not match")),
+                  );
+                  return;
+                }
+
+                try {
+                  final user = FirebaseAuth.instance.currentUser;
+                  if (user?.email == null) throw Exception("User email not found");
+
+                  final cred = EmailAuthProvider.credential(
+                    email: user!.email!,
+                    password: currentPassword,
+                  );
+
+                  await user.reauthenticateWithCredential(cred);
+                  await user.updatePassword(newPassword);
+                  Navigator.pop(context); // Close dialog
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Password updated successfully")),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Failed to update password: ${e.toString()}")),
+                  );
+                }
+              },
+              child: const Text("Change"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final scaffoldContext = context;
@@ -201,6 +281,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   confirmText: "Delete",
                   onConfirm: _deleteAccount,
                 );
+              }),
+              _buildSettingsButton("Change Password", () {
+                _showChangePasswordDialog(context);
               }),
             ]),
             _buildSection("Appearance", [
