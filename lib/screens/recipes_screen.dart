@@ -195,7 +195,6 @@ class _RecipesScreenState extends State<RecipesScreen> {
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                           color: Colors.lightBlueAccent,
-                          decoration: TextDecoration.underline,
                         ),
                       ),
                     ),

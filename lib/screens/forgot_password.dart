@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -67,8 +68,40 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 child: SizedBox(
                   width: double.infinity,
                   child: FilledButton.tonal(
-                    onPressed: () {
-                      // TODO: Add forgot password logic
+                    onPressed: () async {
+                      try {
+                        await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text);
+
+                        // Show success dialog
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Success'),
+                            content: Text('Password reset email sent to ${emailController.text}'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          ),
+                        );
+                      } on FirebaseAuthException catch (err) {
+                        // Show failure dialog
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Error'),
+                            content: Text(err.message ?? 'Failed to send password reset email.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
                     },
                     style: ButtonStyle(
                       backgroundColor:

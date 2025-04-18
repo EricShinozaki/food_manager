@@ -55,7 +55,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
     if (ingredient.isNotEmpty) {
       setState(() {
-        ingredientList.add(Item(name: ingredient, quantity: quantityAsDouble, unit: unit, note: ''));
+        ingredientList.add(Item(name: ingredient, quantity: quantityAsDouble, unit: unit, note: '', nutrition: [], expirationDate: null));
       });
     }
 
@@ -87,9 +87,9 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     Recipe recipe = Recipe(
         name: nameController.text,
         servings: servingsAsDouble,
-        time: cookingTimeAsDouble, // Added cooking time to the recipe
         ingredients: ingredientList,
         instructions: instructionController.text,
+        time: cookingTimeAsDouble,
         nutrition: nutritionData,
         link: linkController.text.isNotEmpty ? linkController.text : null
     );

@@ -96,7 +96,7 @@ class RecipeProvider with ChangeNotifier {
           .get();
 
       if (existingRecipeSnapshot.docs.isEmpty) {
-        final newRecipe = {
+        final newRecipeData = {
           'name': recipe.name,
           'servings': recipe.servings,
           'ingredients': recipe.ingredients.map((item) => item.toMap()).toList(),
@@ -106,14 +106,32 @@ class RecipeProvider with ChangeNotifier {
           if (recipe.time != null) 'time': recipe.time,
         };
 
-        await database
+        final docRef = await database
             .collection('users')
             .doc(user?.uid)
             .collection('recipes')
-            .add(newRecipe);
+            .add(newRecipeData);
 
-        _recipes.add(recipe);
-        notifyListeners();
+        final addedDoc = await docRef.get();
+        final data = addedDoc.data();
+
+        if (data != null) {
+          final newRecipe = Recipe(
+            name: data['name'],
+            servings: data['servings'],
+            ingredients: (data['ingredients'] as List).map((ingredientData) {
+              return Item.fromFireStore(ingredientData);
+            }).toList(),
+            instructions: data['instructions'],
+            nutrition: List<String>.from(data['nutrition']),
+            link: data.containsKey('link') ? data['link'] : null,
+            time: data.containsKey('time') ? (data['time'] as num?)?.toDouble() : null,
+          );
+
+          _recipes.add(newRecipe);
+          notifyListeners();
+        }
+
         return "Successfully added recipe";
       } else {
         if (kDebugMode) {

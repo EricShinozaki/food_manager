@@ -286,9 +286,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 );
               }),
             ]),
-            _buildSection("Appearance", [
-              _buildSettingsButton("Change Theme", _changeTheme),
-            ]),
+            //_buildSection("Appearance", [
+              //_buildSettingsButton("Change Theme", _changeTheme),
+            //]),
           ],
         ),
       ),

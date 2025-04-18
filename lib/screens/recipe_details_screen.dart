@@ -58,7 +58,6 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                       fontWeight: FontWeight.bold,
                       fontSize: 25,
                       color: Colors.lightBlueAccent,
-                      decoration: TextDecoration.underline,
                     ),
                   ),
                 ),
@@ -160,26 +159,6 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
               title: Center(
                 child: Text(
                   fact,
-                  style: const TextStyle(fontSize: 20),
-                ),
-              ),
-            )),
-          ],
-
-          // Optional greyed-out "Nutrition" section
-          if (recipe.nutrition.isNotEmpty) ...[
-            const ListTile(
-              title: Center(
-                child: Text(
-                  "Nutrition",
-                  style: TextStyle(fontSize: 20, color: Colors.grey),
-                ),
-              ),
-            ),
-            ...recipe.nutrition.map((nutritionData) => ListTile(
-              title: Center(
-                child: Text(
-                  nutritionData,
                   style: const TextStyle(fontSize: 20),
                 ),
               ),
