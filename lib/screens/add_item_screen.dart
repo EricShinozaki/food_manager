@@ -204,7 +204,6 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'Nutrition Info:',

@@ -9,14 +9,16 @@ class Recipe {
   double servings;
   List<Item> ingredients;
   String instructions;
+  double? time;
   List<String> nutrition;
-  String? link; // Optional link field
+  String? link;
 
   Recipe({
     required this.name,
     required this.servings,
     required this.ingredients,
     required this.instructions,
+    this.time,
     this.nutrition = const [],
     this.link,
   });
@@ -68,6 +70,7 @@ class RecipeProvider with ChangeNotifier {
           instructions: data['instructions'],
           nutrition: List<String>.from(data['nutrition']),
           link: data.containsKey('link') ? data['link'] : null,
+          time: data.containsKey('time') ? (data['time'] as num?)?.toDouble() : null,
         );
       }).toList();
 
@@ -100,6 +103,7 @@ class RecipeProvider with ChangeNotifier {
           'instructions': recipe.instructions,
           'nutrition': recipe.nutrition,
           if (recipe.link != null) 'link': recipe.link,
+          if (recipe.time != null) 'time': recipe.time,
         };
 
         await database
@@ -177,6 +181,7 @@ class RecipeProvider with ChangeNotifier {
           'instructions': recipe.instructions,
           'nutrition': recipe.nutrition,
           if (recipe.link != null) 'link': recipe.link,
+          if (recipe.time != null) 'time': recipe.time,
         };
 
         await database

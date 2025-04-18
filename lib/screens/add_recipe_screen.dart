@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:food_manager/item_provider.dart';
 import 'package:food_manager/recipe_provider.dart';
@@ -25,6 +28,8 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   List<String> nutritionData = [];
   List<Item> ingredientList = [];
+  final List<String> units = ['tsp', 'tbsp', 'cup', 'pint', 'quart', 'gallon', 'oz', 'fl oz', 'lb', 'pieces'];
+  String? selectedUnit;
 
   final _formKey = GlobalKey<FormState>();
   final _ingredientFormKey = GlobalKey<FormState>();
@@ -41,7 +46,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   void addIngredientToRecipe() {
     final ingredient = ingredientNameController.text;
-    final unit = unitController.text;
+    final unit = selectedUnit ?? '';
     double? quantity = _parseFraction(quantityController.text);
     double quantityAsDouble = quantity ?? 0.0;
     quantityAsDouble = double.parse(quantityAsDouble.toStringAsFixed(2));
@@ -196,15 +201,27 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                         ),
                       ),
                       const SizedBox(width: 10),
-                      Expanded(
-                        child: TextFormField(
-                          controller: unitController,
-                          style: const TextStyle(color: Colors.black, fontSize: 20),
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-                            labelText: 'Unit',
-                          ),
-                        ),
+                      SizedBox(
+                          width: max(MediaQuery.sizeOf(context).width * 0.3, 108.0),
+                          child: DropdownButtonFormField2(
+                            value: selectedUnit,
+                            decoration: InputDecoration(
+                              labelText: 'Unit',
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                            ),
+                            isExpanded: true,
+                            dropdownStyleData: DropdownStyleData(
+                              width: max(MediaQuery.sizeOf(context).width * 0.30, 108.0),
+                              maxHeight: MediaQuery.sizeOf(context).height * 0.3,
+                            ), // <-- this controls the dropdown menu's width!
+                            items: units.map((unit) {
+                              return DropdownMenuItem(
+                                value: unit,
+                                child: Text(unit),
+                              );
+                            }).toList(),
+                            onChanged: (value) => setState(() => selectedUnit = value),
+                          )
                       ),
                       const SizedBox(width: 10),
                       Expanded(
@@ -230,38 +247,39 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   ),
                 ),
               ),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                child: Column(
-                  children: [
-                    Text("Added Ingredients:", style: const TextStyle(fontSize: 20), textAlign: TextAlign.center),
-                    const SizedBox(height: 10),
-                    ...ingredientList.asMap().entries.map((entry) {
-                      int index = entry.key;
-                      Item value = entry.value;
+              if(ingredientList.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Column(
+                    children: [
+                      Text("Added Ingredients:", style: Theme.of(context).textTheme.titleMedium,),
+                      const SizedBox(height: 10),
+                      ...ingredientList.asMap().entries.map((entry) {
+                        int index = entry.key;
+                        Item value = entry.value;
 
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(20),
-                          color: Colors.white,
-                        ),
-                        child: ListTile(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                          title: Text("${value.quantity} ${value.unit} ${value.name}", style: const TextStyle(color: Colors.black, fontSize: 20)),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () => setState(() {
-                              ingredientList.removeAt(index);
-                            }),
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.white,
                           ),
-                        ),
-                      );
-                    }),
-                  ],
+                          child: ListTile(
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            title: Text("${value.quantity} ${value.unit} ${value.name}", style: const TextStyle(color: Colors.black, fontSize: 20)),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () => setState(() {
+                                ingredientList.removeAt(index);
+                              }),
+                            ),
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
                 ),
-              ),
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                 child: TextFormField(
@@ -290,40 +308,40 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 ),
               ),
               if(nutritionData.isNotEmpty)
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  child: Column(
-                    children: [
-                      Text(
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: Column(
+                      children: [
+                        Text(
                           "Added Nutrition info:",
                           style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 10),
-                      ...nutritionData.asMap().entries.map((entry) {
-                        int index = entry.key;
-                        String value = entry.value;
+                        ),
+                        const SizedBox(height: 10),
+                        ...nutritionData.asMap().entries.map((entry) {
+                          int index = entry.key;
+                          String value = entry.value;
 
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            borderRadius: BorderRadius.circular(20),
-                            color: Colors.white,
-                          ),
-                          child: ListTile(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                            title: Text(value, style: const TextStyle(color: Colors.black, fontSize: 20)),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => setState(() {
-                                nutritionData.removeAt(index);
-                              }),
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.white,
                             ),
-                          ),
-                        );
-                      }),
-                    ],
-                  ),
+                            child: ListTile(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                              title: Text(value, style: const TextStyle(color: Colors.black, fontSize: 20)),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () => setState(() {
+                                  nutritionData.removeAt(index);
+                                }),
+                              ),
+                            ),
+                          );
+                        }),
+                      ],
+                  )
                 ),
               FilledButton(
                 onPressed: () async {
@@ -355,7 +373,10 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                       instructionController.clear();
                       ingredientList.clear();
                       nutritionData.clear();
-                      setState(() => nutritionData.clear());
+                      setState(() {
+                        nutritionData.clear();
+                        selectedUnit = null;
+                      });
                     }
                   }
                 },
