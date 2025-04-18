@@ -18,6 +18,7 @@ class AddRecipeScreen extends StatefulWidget {
 class _AddRecipeScreenState extends State<AddRecipeScreen> {
   final nameController = TextEditingController();
   final servingsController = TextEditingController();
+  final timeController = TextEditingController(); // Added cooking time controller
   final ingredientsController = TextEditingController();
   final instructionController = TextEditingController();
   final nutritionController = TextEditingController();
@@ -60,6 +61,9 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     unitController.clear();
     ingredientNameController.clear();
     quantityController.clear();
+    setState(() {
+      selectedUnit = null;
+    });
   }
 
   double? parseServings() {
@@ -67,14 +71,22 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     return double.tryParse(servingsText);
   }
 
+  double? parseCookingTime() {
+    final timeText = timeController.text;
+    return double.tryParse(timeText);
+  }
+
   Future<String> add() async {
     final recipeProvider = Provider.of<RecipeProvider>(context, listen: false);
     double? servings = parseServings();
-    double servingsAsInt = servings ?? 0.0;
+    double servingsAsDouble = servings ?? 0.0;
+    double? cookingTime = parseCookingTime(); // Parse cooking time
+    double cookingTimeAsDouble = cookingTime ?? 0.0;
 
     Recipe recipe = Recipe(
         name: nameController.text,
-        servings: servingsAsInt,
+        servings: servingsAsDouble,
+        time: cookingTimeAsDouble, // Added cooking time to the recipe
         ingredients: ingredientList,
         instructions: instructionController.text,
         nutrition: nutritionData,
@@ -148,112 +160,227 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
           key: _formKey,
           child: Column(
             children: [
-              SizedBox(height: 10),
+              const SizedBox(height: 16),
+
+              // Basic Recipe Information Section
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: Text(
+                  "Recipe Information",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                 child: TextFormField(
                   controller: nameController,
                   validator: _requiredValidator,
-                  style: const TextStyle(color: Colors.black, fontSize: 20),
+                  minLines: 1,
+                  maxLines: null,
+                  style: const TextStyle(color: Colors.black, fontSize: 18),
                   decoration: InputDecoration(
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
                     labelText: 'Recipe Name',
+                    prefixIcon: Icon(Icons.restaurant_menu),
                   ),
                 ),
               ),
+
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                child: TextField(
+                child: TextFormField(
                   controller: linkController,
-                  style: const TextStyle(color: Colors.black, fontSize: 20),
+                  minLines: 1,
+                  maxLines: null,
+                  style: const TextStyle(color: Colors.black, fontSize: 18),
                   decoration: InputDecoration(
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
                     labelText: 'Link to recipe',
+                    hintText: 'Optional',
+                    prefixIcon: Icon(Icons.link),
                   ),
                 ),
               ),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                child: TextField(
-                  controller: servingsController,
-                  style: const TextStyle(color: Colors.black, fontSize: 20),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-                    labelText: 'Servings',
+
+              Row(
+                children: [
+                  // Servings field
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 20, right: 10, top: 5, bottom: 5),
+                      child: TextFormField(
+                        controller: servingsController,
+                        validator: _requiredDoubleValidator,
+                        minLines: 1,
+                        maxLines: null,
+                        style: const TextStyle(color: Colors.black, fontSize: 18),
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                          labelText: 'Servings',
+                          prefixIcon: Icon(Icons.people),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Cooking time field
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 20, left: 10, top: 5, bottom: 5),
+                      child: TextFormField(
+                        controller: timeController,
+                        validator: _requiredDoubleValidator,
+                        minLines: 1,
+                        maxLines: null,
+                        style: const TextStyle(color: Colors.black, fontSize: 18),
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                          labelText: 'Time (min)',
+                          prefixIcon: Icon(Icons.timer),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              // Ingredients Section
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                child: Text(
+                  "Ingredients",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
+
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
                 child: Form(
                   key: _ingredientFormKey,
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: quantityController,
-                          validator: _requiredDoubleValidator,
-                          style: const TextStyle(color: Colors.black, fontSize: 20),
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-                            labelText: 'Quantity',
-                          ),
+                      const Text(
+                        "Add New Ingredient",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      SizedBox(
-                          width: max(MediaQuery.sizeOf(context).width * 0.3, 108.0),
-                          child: DropdownButtonFormField2(
-                            value: selectedUnit,
-                            decoration: InputDecoration(
-                              labelText: 'Unit',
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                      const SizedBox(height: 12),
+
+                      // Quantity field
+                      TextFormField(
+                        controller: quantityController,
+                        validator: _requiredDoubleValidator,
+                        style: const TextStyle(color: Colors.black, fontSize: 18),
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                          labelText: 'Quantity',
+                          prefixIcon: const Icon(Icons.scale),
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // Unit dropdown field
+                      DropdownButtonFormField2(
+                        value: selectedUnit,
+                        decoration: InputDecoration(
+                          labelText: 'Unit',
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                          prefixIcon: const Icon(Icons.straighten),
+                        ),
+                        isExpanded: true,
+                        dropdownStyleData: DropdownStyleData(
+                          maxHeight: MediaQuery.sizeOf(context).height * 0.3,
+                          width: MediaQuery.sizeOf(context).width - 80,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        items: units.map((unit) {
+                          return DropdownMenuItem(
+                            value: unit,
+                            child: Text(unit),
+                          );
+                        }).toList(),
+                        onChanged: (value) => setState(() => selectedUnit = value),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // Ingredient name field
+                      TextFormField(
+                        controller: ingredientNameController,
+                        validator: _ingredientRequiredValidator,
+                        style: const TextStyle(color: Colors.black, fontSize: 18),
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                          labelText: 'Ingredient Name',
+                          prefixIcon: const Icon(Icons.food_bank),
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Add ingredient button
+                      Center(
+                        child: ElevatedButton.icon(
+                          label: const Text('Add Ingredient'),
+                          onPressed: () {
+                            if (_ingredientFormKey.currentState!.validate()) {
+                              addIngredientToRecipe();
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.buttonBackground,
+                            foregroundColor: AppColors.buttonText,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(28),
                             ),
-                            isExpanded: true,
-                            dropdownStyleData: DropdownStyleData(
-                              width: max(MediaQuery.sizeOf(context).width * 0.30, 108.0),
-                              maxHeight: MediaQuery.sizeOf(context).height * 0.3,
-                            ), // <-- this controls the dropdown menu's width!
-                            items: units.map((unit) {
-                              return DropdownMenuItem(
-                                value: unit,
-                                child: Text(unit),
-                              );
-                            }).toList(),
-                            onChanged: (value) => setState(() => selectedUnit = value),
-                          )
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextFormField(
-                          controller: ingredientNameController,
-                          validator: _ingredientRequiredValidator,
-                          style: const TextStyle(color: Colors.black, fontSize: 20),
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-                            labelText: 'Ingredient',
+                            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                           ),
                         ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.add),
-                        onPressed: () {
-                          if (_ingredientFormKey.currentState!.validate()) {
-                            addIngredientToRecipe();
-                          }
-                        },
                       ),
                     ],
                   ),
                 ),
               ),
+
+              // Ingredients List
               if(ingredientList.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Added Ingredients:", style: Theme.of(context).textTheme.titleMedium,),
-                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          const Icon(Icons.list),
+                          const SizedBox(width: 8),
+                          Text(
+                            "Added Ingredients (${ingredientList.length})",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
                       ...ingredientList.asMap().entries.map((entry) {
                         int index = entry.key;
                         Item value = entry.value;
@@ -261,13 +388,16 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                         return Container(
                           margin: const EdgeInsets.only(bottom: 8),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(16),
                             color: Colors.white,
                           ),
                           child: ListTile(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                            title: Text("${value.quantity} ${value.unit} ${value.name}", style: const TextStyle(color: Colors.black, fontSize: 20)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            title: Text(
+                              "${value.quantity} ${value.unit} ${value.name}",
+                              style: const TextStyle(color: Colors.black, fontSize: 16),
+                            ),
                             trailing: IconButton(
                               icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () => setState(() {
@@ -280,26 +410,59 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                     ],
                   ),
                 ),
+
+              // Instructions Section
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                child: Text(
+                  "Instructions",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                 child: TextFormField(
                   controller: instructionController,
                   validator: _requiredValidator,
-                  style: const TextStyle(color: Colors.black, fontSize: 20),
+                  style: const TextStyle(color: Colors.black, fontSize: 18),
+                  minLines: 3,
+                  maxLines: null,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
                     labelText: 'Instructions',
+                    alignLabelWithHint: true,
                   ),
                 ),
               ),
+
+              // Nutrition Section
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                child: Text(
+                  "Nutrition Information",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: TextField(
                   controller: nutritionController,
-                  style: const TextStyle(color: Colors.black, fontSize: 20),
+                  minLines: 1,
+                  maxLines: null,
+                  style: const TextStyle(color: Colors.black, fontSize: 18),
                   decoration: InputDecoration(
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-                    labelText: 'Nutrition',
+                    labelText: 'Nutrition Info',
+                    hintText: 'e.g., Calories: 240 kcal',
+                    prefixIcon: const Icon(Icons.monitor_weight),
                     suffixIcon: IconButton(
                       icon: const Icon(Icons.add),
                       onPressed: addNutrition,
@@ -307,16 +470,28 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   ),
                 ),
               ),
+
+              // Nutrition List
               if(nutritionData.isNotEmpty)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "Added Nutrition info:",
-                          style: Theme.of(context).textTheme.titleMedium,
+                        Row(
+                          children: [
+                            const Icon(Icons.restaurant),
+                            const SizedBox(width: 8),
+                            Text(
+                              "Added Nutrition Info (${nutritionData.length})",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 8),
                         ...nutritionData.asMap().entries.map((entry) {
                           int index = entry.key;
                           String value = entry.value;
@@ -324,13 +499,13 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                           return Container(
                             margin: const EdgeInsets.only(bottom: 8),
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: Colors.grey.shade300),
+                              borderRadius: BorderRadius.circular(16),
                               color: Colors.white,
                             ),
                             child: ListTile(
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                              title: Text(value, style: const TextStyle(color: Colors.black, fontSize: 20)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              title: Text(value, style: const TextStyle(color: Colors.black, fontSize: 16)),
                               trailing: IconButton(
                                 icon: const Icon(Icons.delete, color: Colors.red),
                                 onPressed: () => setState(() {
@@ -341,56 +516,73 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                           );
                         }),
                       ],
-                  )
+                    )
                 ),
-              FilledButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    String result = await add();
-                    if (!context.mounted) return;
 
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext dialogContext) => AlertDialog(
-                        content: Text(result, style: const TextStyle(fontSize: 18)),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(dialogContext),
-                            child: const Text('Close'),
+              // Submit Button
+              const SizedBox(height: 20),
+              Center(
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  height: 56,
+                  margin: const EdgeInsets.only(bottom: 32),
+                  child: FilledButton(
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        String result = await add();
+                        if (!context.mounted) return;
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(result),
+                            backgroundColor: result == "Recipe added successfully"
+                                ? Colors.green
+                                : Colors.red,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
-                        ],
-                      ),
-                    );
+                        );
 
-                    if (result == "Recipe added successfully") {
-                      nameController.clear();
-                      quantityController.clear();
-                      unitController.clear();
-                      linkController.clear();
-                      servingsController.clear();
-                      nutritionController.clear();
-                      ingredientsController.clear();
-                      instructionController.clear();
-                      ingredientList.clear();
-                      nutritionData.clear();
-                      setState(() {
-                        nutritionData.clear();
-                        selectedUnit = null;
-                      });
-                    }
-                  }
-                },
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.buttonBackground,
-                  foregroundColor: AppColors.buttonText,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                        if (result == "Recipe added successfully") {
+                          nameController.clear();
+                          timeController.clear();
+                          quantityController.clear();
+                          unitController.clear();
+                          linkController.clear();
+                          servingsController.clear();
+                          nutritionController.clear();
+                          ingredientsController.clear();
+                          instructionController.clear();
+                          ingredientList.clear();
+                          nutritionData.clear();
+                          setState(() {
+                            nutritionData.clear();
+                            selectedUnit = null;
+                          });
+                        }
+                      }
+                    },
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.buttonBackground,
+                      foregroundColor: AppColors.buttonText,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                    ),
+                    child: const Text(
+                      "SAVE RECIPE",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                 ),
-                child: const Text("Add Recipe"),
               ),
-              SizedBox(height: 20)
             ],
           ),
         ),
