@@ -11,9 +11,12 @@ class InventoryScreen extends StatefulWidget {
   State<InventoryScreen> createState() => _InventoryScreenState();
 }
 
+enum SortBy { name, expirationDate, quantity}
+
 class _InventoryScreenState extends State<InventoryScreen> {
   final TextEditingController _searchKey = TextEditingController();
   List<Item> _filteredItemsList = [];
+  SortBy _currentSort = SortBy.name;
 
   @override
   void initState() {
@@ -35,6 +38,22 @@ class _InventoryScreenState extends State<InventoryScreen> {
       _filteredItemsList = allItems
           .where((item) => item.name.toLowerCase().contains(searchText))
           .toList();
+      _sortItems();
+    });
+  }
+
+  void _sortItems() {
+    _filteredItemsList.sort((a, b) {
+      switch (_currentSort) {
+        case SortBy.name:
+          return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        case SortBy.expirationDate:
+          final aDate = a.expirationDate ?? DateTime(9999);
+          final bDate = b.expirationDate ?? DateTime(9999);
+          return aDate.compareTo(bDate);
+        case SortBy.quantity:
+          return a.quantity.compareTo(b.quantity);
+      }
     });
   }
 
@@ -46,34 +65,56 @@ class _InventoryScreenState extends State<InventoryScreen> {
     // Update filtered list when search text changes or items change
     if (_searchKey.text.isEmpty) {
       _filteredItemsList = List.from(allItems);
+      _sortItems();
     }
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Theme.of(context).colorScheme.primary,
-        title: Container(
-          margin: const EdgeInsets.only(right: 30),
-          height: 40,
-          decoration: BoxDecoration(
-            color: const Color(0xffF5F5F5),
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: TextField(
-            controller: _searchKey,
-            decoration: InputDecoration(
-              prefixIcon: Icon(Icons.search, color: Theme.of(context).primaryColorDark),
-              suffixIcon: IconButton(
-                icon: Icon(Icons.clear, color: Theme.of(context).primaryColorDark),
-                onPressed: () {
-                  _searchKey.clear();
-                  FocusScope.of(context).unfocus();
-                },
+        title: Row(
+          children: [
+            Expanded(
+              flex: 5, // Adjust the flex if you want more space for the search bar
+              child: Container(
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xffF5F5F5),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: TextField(
+                  controller: _searchKey,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.search, color: Theme.of(context).primaryColorDark),
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.clear, color: Theme.of(context).primaryColorDark),
+                      onPressed: () {
+                        _searchKey.clear();
+                        FocusScope.of(context).unfocus();
+                      },
+                    ),
+                    hintText: 'Search...',
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                ),
               ),
-              hintText: 'Search...',
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(vertical: 10),
             ),
-          ),
+            const SizedBox(width: 10),
+            PopupMenuButton<SortBy>(
+              icon: const Icon(Icons.sort),
+              onSelected: (SortBy selected) {
+                setState(() {
+                  _currentSort = selected;
+                  _sortItems();
+                });
+              },
+              itemBuilder: (BuildContext context) => [
+                const PopupMenuItem(value: SortBy.name, child: Text('Sort by name')),
+                const PopupMenuItem(value: SortBy.expirationDate, child: Text('Sort by expiration')),
+              ],
+            ),
+          ],
         ),
         iconTheme: IconThemeData(color: Theme.of(context).primaryColorDark),
         elevation: 0,
@@ -100,7 +141,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
       ),
     );
   }
-
 
   Widget _buildItemCard(BuildContext context, Item item) {
     return Card(

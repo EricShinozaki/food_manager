@@ -68,12 +68,12 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     double servingsAsInt = servings ?? 0.0;
 
     Recipe recipe = Recipe(
-      name: nameController.text,
-      servings: servingsAsInt,
-      ingredients: ingredientList,
-      instructions: instructionController.text,
-      nutrition: nutritionData,
-      link: linkController.text.isNotEmpty ? linkController.text : null
+        name: nameController.text,
+        servings: servingsAsInt,
+        ingredients: ingredientList,
+        instructions: instructionController.text,
+        nutrition: nutritionData,
+        link: linkController.text.isNotEmpty ? linkController.text : null
     );
 
     return await recipeProvider.addRecipe(recipe);
@@ -144,21 +144,80 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
           child: Column(
             children: [
               SizedBox(height: 10),
-              _buildTextField('Recipe Name', nameController, _requiredValidator),
-              _buildTextField('Link to recipe', linkController, null),
-              _buildTextField('Servings', servingsController, null, isFormField: false),
-
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                child: TextFormField(
+                  controller: nameController,
+                  validator: _requiredValidator,
+                  style: const TextStyle(color: Colors.black, fontSize: 20),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                    labelText: 'Recipe Name',
+                  ),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                child: TextField(
+                  controller: linkController,
+                  style: const TextStyle(color: Colors.black, fontSize: 20),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                    labelText: 'Link to recipe',
+                  ),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                child: TextField(
+                  controller: servingsController,
+                  style: const TextStyle(color: Colors.black, fontSize: 20),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                    labelText: 'Servings',
+                  ),
+                ),
+              ),
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: Form(
                   key: _ingredientFormKey,
                   child: Row(
                     children: [
-                      _buildIngredientField('Quantity', quantityController, _requiredDoubleValidator),
+                      Expanded(
+                        child: TextFormField(
+                          controller: quantityController,
+                          validator: _requiredDoubleValidator,
+                          style: const TextStyle(color: Colors.black, fontSize: 20),
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                            labelText: 'Quantity',
+                          ),
+                        ),
+                      ),
                       const SizedBox(width: 10),
-                      _buildIngredientField('Unit', unitController, null),
+                      Expanded(
+                        child: TextFormField(
+                          controller: unitController,
+                          style: const TextStyle(color: Colors.black, fontSize: 20),
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                            labelText: 'Unit',
+                          ),
+                        ),
+                      ),
                       const SizedBox(width: 10),
-                      _buildIngredientField('Ingredient', ingredientNameController, _ingredientRequiredValidator),
+                      Expanded(
+                        child: TextFormField(
+                          controller: ingredientNameController,
+                          validator: _ingredientRequiredValidator,
+                          style: const TextStyle(color: Colors.black, fontSize: 20),
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                            labelText: 'Ingredient',
+                          ),
+                        ),
+                      ),
                       IconButton(
                         icon: const Icon(Icons.add),
                         onPressed: () {
@@ -171,17 +230,50 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   ),
                 ),
               ),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                child: Column(
+                  children: [
+                    Text("Added Ingredients:", style: const TextStyle(fontSize: 20), textAlign: TextAlign.center),
+                    const SizedBox(height: 10),
+                    ...ingredientList.asMap().entries.map((entry) {
+                      int index = entry.key;
+                      Item value = entry.value;
 
-              _buildListSection("Added Ingredients:", ingredientList.map((item) {
-                return "${item.quantity} ${item.unit} ${item.name}";
-              }).toList(), (index) {
-                setState(() {
-                  ingredientList.removeAt(index);
-                });
-              }),
-
-              _buildTextField('Instructions', instructionController, _requiredValidator),
-
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.white,
+                        ),
+                        child: ListTile(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          title: Text("${value.quantity} ${value.unit} ${value.name}", style: const TextStyle(color: Colors.black, fontSize: 20)),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => setState(() {
+                              ingredientList.removeAt(index);
+                            }),
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                child: TextFormField(
+                  controller: instructionController,
+                  validator: _requiredValidator,
+                  style: const TextStyle(color: Colors.black, fontSize: 20),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                    labelText: 'Instructions',
+                  ),
+                ),
+              ),
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: TextField(
@@ -197,12 +289,42 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   ),
                 ),
               ),
+              if(nutritionData.isNotEmpty)
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                  child: Column(
+                    children: [
+                      Text(
+                          "Added Nutrition info:",
+                          style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 10),
+                      ...nutritionData.asMap().entries.map((entry) {
+                        int index = entry.key;
+                        String value = entry.value;
 
-              _buildListSection("Added Nutrition info:", nutritionData, (index) {
-                setState(() {
-                  nutritionData.removeAt(index);
-                });
-              }),
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.white,
+                          ),
+                          child: ListTile(
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            title: Text(value, style: const TextStyle(color: Colors.black, fontSize: 20)),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () => setState(() {
+                                nutritionData.removeAt(index);
+                              }),
+                            ),
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
+                ),
               FilledButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
@@ -245,82 +367,12 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                 ),
-                child: const Text("Add Item"),
+                child: const Text("Add Recipe"),
               ),
               SizedBox(height: 20)
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildTextField(String label, TextEditingController controller, String? Function(String?)? validator, {bool isFormField = true}) {
-    final input = InputDecoration(
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-      labelText: label,
-    );
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-      child: isFormField
-          ? TextFormField(
-        controller: controller,
-        validator: validator,
-        style: const TextStyle(color: Colors.black, fontSize: 20),
-        decoration: input,
-      )
-          : TextField(
-        controller: controller,
-        style: const TextStyle(color: Colors.black, fontSize: 20),
-        decoration: input,
-      ),
-    );
-  }
-
-  Widget _buildIngredientField(String label, TextEditingController controller, String? Function(String?)? validator) {
-    return Expanded(
-      child: TextFormField(
-        controller: controller,
-        validator: validator,
-        style: const TextStyle(color: Colors.black, fontSize: 20),
-        decoration: InputDecoration(
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-          labelText: label,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildListSection(String title, List<String> items, void Function(int) onDelete) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-      child: Column(
-        children: [
-          Text(title, style: const TextStyle(fontSize: 20), textAlign: TextAlign.center),
-          const SizedBox(height: 10),
-          ...items.asMap().entries.map((entry) {
-            int index = entry.key;
-            String value = entry.value;
-
-            return Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.white,
-              ),
-              child: ListTile(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                title: Text(value, style: const TextStyle(color: Colors.black, fontSize: 20)),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () => onDelete(index),
-                ),
-              ),
-            );
-          }),
-        ],
       ),
     );
   }

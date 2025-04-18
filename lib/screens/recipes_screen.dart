@@ -48,9 +48,10 @@ class _RecipesScreenState extends State<RecipesScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Container(
-          margin: const EdgeInsets.only(right: 30),
+          margin: const EdgeInsets.symmetric(horizontal: 30),
           height: 40,
           decoration: BoxDecoration(
               color: const Color(0xffF5F5F5),

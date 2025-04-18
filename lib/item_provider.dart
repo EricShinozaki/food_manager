@@ -206,16 +206,6 @@ class ItemProvider with ChangeNotifier {
     }
   }
 
-  void sortItemsByName() {
-    _items.sort((a, b) => a.name.compareTo(b.name));
-    notifyListeners();
-  }
-
-  void sortItemsByQuantity() {
-    _items.sort((a, b) => a.quantity.compareTo(b.quantity));
-    notifyListeners();
-  }
-
   void _clearItems() {
     _items = [];
     notifyListeners();
