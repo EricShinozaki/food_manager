@@ -200,8 +200,25 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
               width: double.infinity,
               child: FilledButton.tonal(
                 onPressed: () {
-                  recipeProvider.removeRecipe(recipe.name);
-                  context.go('/recipes');
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text("Remove ${recipe.name}"),
+                        actions: [
+                          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              recipeProvider.removeRecipe(recipe.name);
+                              context.go('/recipes');
+                            },
+                            child: const Text('Confirm'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
                 },
                 style: ButtonStyle(
                   backgroundColor: WidgetStateProperty.all(Colors.transparent),
