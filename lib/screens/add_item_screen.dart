@@ -24,7 +24,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
   final dateController = TextEditingController();
 
   List<String> nutritionData = [];
-  final List<String> units = ['tsp', 'tbsp', 'cup', 'pint', 'quart', 'gallon', 'oz', 'fl oz', 'lb', 'pieces'];
+  final List<String> units = ['tsp', 'tbsp', 'cup', 'pint', 'quart', 'gallon', 'oz', 'lb', 'pieces'];
   String? selectedUnit;
 
   void addNutrition() {

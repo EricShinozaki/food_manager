@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:math';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -29,7 +30,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   List<String> nutritionData = [];
   List<Item> ingredientList = [];
-  final List<String> units = ['tsp', 'tbsp', 'cup', 'pint', 'quart', 'gallon', 'oz', 'fl oz', 'lb', 'pieces'];
+  final List<String> units = ['tsp', 'tbsp', 'cup', 'pint', 'quart', 'gallon', 'oz', 'lb', 'pieces'];
   String? selectedUnit;
 
   final _formKey = GlobalKey<FormState>();
@@ -150,6 +151,14 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final recipeProvider = Provider.of<RecipeProvider>(context);
+    final allRecipes = recipeProvider.recipes;
+    HashSet<String> recipes = HashSet<String>();
+
+    for(Recipe i in allRecipes){
+      recipes.add(i.name.toLowerCase());
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -529,13 +538,20 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   child: FilledButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        String result = await add();
+                        String result = "";
+
+                        if(!recipes.contains(nameController.text.toLowerCase())){
+                          result = await add();
+                        } else {
+                          result = "A recipe with this name already exists";
+                        }
+
                         if (!context.mounted) return;
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(result),
-                            backgroundColor: result == "Recipe added successfully"
+                            backgroundColor: result == "Successfully added recipe"
                                 ? Colors.green
                                 : Colors.red,
                             behavior: SnackBarBehavior.floating,
@@ -545,7 +561,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                           ),
                         );
 
-                        if (result == "Recipe added successfully") {
+                        if (result == "Successfully added recipe") {
                           nameController.clear();
                           timeController.clear();
                           quantityController.clear();
