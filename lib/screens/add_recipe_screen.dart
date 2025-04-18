@@ -1,6 +1,4 @@
 import 'dart:collection';
-import 'dart:math';
-
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:food_manager/item_provider.dart';
@@ -230,7 +228,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
                           labelText: 'Servings',
-                          prefixIcon: Icon(Icons.people),
+                          prefixIcon: Icon(Icons.set_meal),
                         ),
                       ),
                     ),
@@ -339,7 +337,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
                           labelText: 'Ingredient Name',
-                          prefixIcon: const Icon(Icons.food_bank),
+                          prefixIcon: const Icon(Icons.inventory),
                         ),
                       ),
 

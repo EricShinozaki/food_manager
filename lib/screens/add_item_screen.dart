@@ -89,32 +89,6 @@ class _AddItemScreenState extends State<AddItemScreen> {
     return null;
   }
 
-  Widget buildTextField({
-    required TextEditingController controller,
-    required String label,
-    String? Function(String?)? validator,
-    TextInputType? keyboardType,
-    VoidCallback? onTap,
-    bool readOnly = false,
-    Widget? suffixIcon,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      child: TextFormField(
-        controller: controller,
-        validator: validator,
-        keyboardType: keyboardType,
-        readOnly: readOnly,
-        onTap: onTap,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-          suffixIcon: suffixIcon,
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,11 +102,22 @@ class _AddItemScreenState extends State<AddItemScreen> {
           child: Column(
             children: [
               const SizedBox(height: 10),
-              buildTextField(
-                controller: nameController,
-                label: 'Item Name',
-                validator: _requiredValidator,
+
+              // Item Name Field
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: TextFormField(
+                  controller: nameController,
+                  validator: _requiredValidator,
+                  decoration: InputDecoration(
+                    labelText: 'Item Name',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                    prefixIcon: Icon(Icons.inventory)
+                  ),
+                ),
               ),
+
+              // Quantity and Unit Row
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                 child: Row(
@@ -145,47 +130,68 @@ class _AddItemScreenState extends State<AddItemScreen> {
                         decoration: InputDecoration(
                           labelText: 'Quantity',
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                          prefixIcon: const Icon(Icons.scale),
                         ),
                       ),
                     ),
                     const SizedBox(width: 12),
                     SizedBox(
-                      width: max(MediaQuery.sizeOf(context).width * 0.3, 108.0),
-                      child: DropdownButtonFormField2(
-                        value: selectedUnit,
-                        decoration: InputDecoration(
-                          labelText: 'Unit',
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-                        ),
-                        isExpanded: true,
-                        dropdownStyleData: DropdownStyleData(
-                          width: max(MediaQuery.sizeOf(context).width * 0.30, 108.0),
-                          maxHeight: MediaQuery.sizeOf(context).height * 0.3,
-                        ), // <-- this controls the dropdown menu's width!
-                        items: units.map((unit) {
-                          return DropdownMenuItem(
-                            value: unit,
-                            child: Text(unit),
-                          );
-                        }).toList(),
-                        onChanged: (value) => setState(() => selectedUnit = value),
-                      )
+                        width: max(MediaQuery.of(context).size.width * 0.3, 108.0),
+                        child: DropdownButtonFormField2(
+                          value: selectedUnit,
+                          decoration: InputDecoration(
+                            labelText: 'Unit',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                            prefixIcon: const Icon(Icons.straighten),
+                          ),
+                          isExpanded: true,
+                          dropdownStyleData: DropdownStyleData(
+                            width: max(MediaQuery.of(context).size.width * 0.30, 108.0),
+                            maxHeight: MediaQuery.of(context).size.height * 0.3,
+                          ),
+                          items: units.map((unit) {
+                            return DropdownMenuItem(
+                              value: unit,
+                              child: Text(unit),
+                            );
+                          }).toList(),
+                          onChanged: (value) => setState(() => selectedUnit = value),
+                        )
                     ),
                   ],
                 ),
               ),
-              buildTextField(
-                controller: noteController,
-                label: 'Notes (optional)',
+
+              // Notes Field
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: TextFormField(
+                  controller: noteController,
+                  decoration: InputDecoration(
+                    labelText: 'Notes (optional)',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                    prefixIcon: Icon(Icons.note_add),
+                  ),
+                ),
               ),
-              buildTextField(
-                controller: dateController,
-                label: 'Expiration Date (MM/DD/YYYY)',
-                validator: _validateDate,
-                onTap: pickDate,
-                readOnly: true,
-                suffixIcon: Icon(Icons.calendar_today),
+
+              // Expiration Date Field
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: TextFormField(
+                  controller: dateController,
+                  validator: _validateDate,
+                  onTap: pickDate,
+                  readOnly: true,
+                  decoration: InputDecoration(
+                    labelText: 'Expiration Date (MM/DD/YYYY)',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                    suffixIcon: const Icon(Icons.calendar_today),
+                  ),
+                ),
               ),
+
+              // Nutrition Info Field
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                 child: TextFormField(
@@ -194,12 +200,15 @@ class _AddItemScreenState extends State<AddItemScreen> {
                     labelText: 'Add Nutrition Info',
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
                     suffixIcon: IconButton(
-                      icon: Icon(Icons.add),
+                      icon: const Icon(Icons.add),
                       onPressed: addNutrition,
                     ),
+                    prefixIcon: Icon(Icons.monitor_weight)
                   ),
                 ),
               ),
+
+              // Nutrition Info List
               if (nutritionData.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -220,7 +229,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                           child: ListTile(
                             title: Text(value),
                             trailing: IconButton(
-                              icon: Icon(Icons.delete, color: Colors.red),
+                              icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () {
                                 setState(() {
                                   nutritionData.removeAt(index);
@@ -233,6 +242,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
                     ],
                   ),
                 ),
+
+              // Add Item Button
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
                 child: FilledButton(
