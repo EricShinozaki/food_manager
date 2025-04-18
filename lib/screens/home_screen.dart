@@ -27,13 +27,27 @@ class _HomeScreenState extends State<HomeScreen> {
       usersItems.add(i.name.toLowerCase());
     }
 
+    for(Recipe recipe in recipeProvider.recipes){
+      bool hasAllIngredients = true;
+
+      for(Item item in recipe.ingredients){
+        if(!usersItems.contains(item.name)){
+          hasAllIngredients = false;
+        }
+      }
+
+      if(hasAllIngredients){
+        recipes.add(recipe);
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text(widget.title),
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
         children: [
           ListTile(
             title: Align(
@@ -42,16 +56,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 "Recipes you can make",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25)
               ),
-
             )
           ),
 
           if (recipes.isNotEmpty) ...[
             ...recipes.map((recipe) => ListTile(
+              dense: true,
+              visualDensity: VisualDensity(vertical: -4),
               title: Center(
                 child: Text(
                   recipe.name,
-                  style: TextStyle(fontSize: 17),
+                  style: TextStyle(fontSize: 20),
                 ),
               ),
             )),
