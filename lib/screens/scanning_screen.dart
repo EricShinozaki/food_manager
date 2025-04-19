@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image/image.dart' as img;
 
 
@@ -17,6 +16,12 @@ class ScanningScreen extends StatefulWidget {
 }
 
 class _ScanningScreenState extends State<ScanningScreen> {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
+  }
+  /*
   File? galleryFile;
   String _recognizedText = "";
   final picker = ImagePicker();
@@ -186,4 +191,5 @@ class _ScanningScreenState extends State<ScanningScreen> {
       },
     );
   }
+   */
 }
