@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:food_manager/item_provider.dart';
 import 'package:food_manager/recipe_provider.dart';
+import 'package:food_manager/utilities/conversions.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -28,11 +29,15 @@ class _HomeScreenState extends State<HomeScreen> {
     final threeDaysLater = now.add(const Duration(days: 3));
 
     // Process items for recipes and expiration
+    final converter = MeasurementConverter();
     HashSet<String> usersItems = HashSet<String>();
+    HashMap<String, double> itemQuantity = HashMap<String, double>();
+    HashMap<String, String> itemUnit = HashMap<String, String>();
 
     for(Item item in items) {
       usersItems.add(item.name.toLowerCase());
-
+      itemQuantity[item.name] = item.quantity;
+      itemUnit[item.name] = item.unit;
       // Check expiration status
       if (item.expirationDate != null) {
         if (item.expirationDate!.isBefore(now)) {
@@ -48,9 +53,20 @@ class _HomeScreenState extends State<HomeScreen> {
       bool hasAllIngredients = true;
 
       for(Item ingredient in recipe.ingredients) {
-        if(!usersItems.contains(ingredient.name.toLowerCase())) {
+        if(usersItems.contains(ingredient.name.toLowerCase())) {
+          var converted = -1.0;
+          if(ingredient.unit == null || itemUnit[ingredient.name] == null){
+            converted = itemQuantity[ingredient.name] ?? 1.0;
+            converted *= itemQuantity[ingredient.name] ?? -1;
+          } else {
+            converted = converter.convert(itemUnit[ingredient.name]!, ingredient.unit) * itemQuantity[ingredient.name]!;
+          }
+          if(converted < ingredient.quantity){
+            hasAllIngredients = false;
+            break;
+          }
+        } else {
           hasAllIngredients = false;
-          break;
         }
       }
 

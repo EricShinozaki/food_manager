@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../utilities/conversions.dart';
+
 class RecipeDetailsScreen extends StatefulWidget {
   const RecipeDetailsScreen({super.key, required this.title});
 
@@ -30,10 +32,36 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
     final items = itemProvider.items;
     final recipeProvider = Provider.of<RecipeProvider>(context);
     final recipe = recipeProvider.recipes.firstWhere((recipe) => recipe.name == widget.title);
+    HashSet<String> itemsInRecipe = HashSet<String>();
     HashSet<String> usersItems = HashSet<String>();
+    HashMap<String, double> itemQuantity = HashMap<String, double>();
+    HashMap<String, String> itemUnit = HashMap<String, String>();
+    final converter = MeasurementConverter();
+
+    for(Item i in recipe.ingredients){
+      itemsInRecipe.add(i.name);
+    }
 
     for(Item i in items){
-      usersItems.add(i.name.toLowerCase());
+      if(itemsInRecipe.contains(i.name)){
+        usersItems.add(i.name.toLowerCase());
+        itemQuantity[i.name] = i.quantity;
+        itemUnit[i.name] = i.unit;
+      }
+    }
+
+    bool hasEnough(String ingredientName, Item recipeIngredientInfo){
+      if(!usersItems.contains(ingredientName)){
+        return false;
+      }
+
+      var converted = converter.convert(itemUnit[ingredientName]!, recipeIngredientInfo.unit) * itemQuantity[ingredientName]!;
+
+      if(converted < recipeIngredientInfo.quantity){
+        return false;
+      }
+
+      return true;
     }
 
     return Scaffold(
@@ -104,7 +132,7 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        usersItems.contains(ingredient.name.toLowerCase())
+                        hasEnough(ingredient.name.toLowerCase(), ingredient)
                             ? Icons.check
                             : Icons.close,
                         size: 24,
