@@ -1,4 +1,4 @@
-# food_manager
+# Food Manager
 
 Food Manager helps you stay on top of your kitchen. Save your favorite recipes, track your ingredients, and know exactly what you can cook with what you already have.
 
